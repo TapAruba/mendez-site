@@ -549,6 +549,13 @@ footer .fl a:hover{color:var(--teal)}
   .cal-titles .cal-t2{display:none}
 }
 
+/* ---- Inline text links + partner credit (car rental) ---- */
+.txt-link{color:var(--teal);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(44,110,119,.4);transition:.25s}
+.txt-link:hover{color:var(--acc);text-decoration-color:var(--acc)}
+.txt-link svg{display:inline-block;vertical-align:-1px;margin-left:1px}
+.partner-note{text-align:center;max-width:620px;margin:34px auto 0;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.partner-note b{color:var(--ink);font-weight:500}
+
 /* ---- In-page booking modal (villa pages) ---- */
 .bkm{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:22px}
 .bkm[hidden]{display:none}
