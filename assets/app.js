@@ -480,6 +480,8 @@
           'Extras: ' + (extras.length ? extras.join(', ') : 'None'),
           'Name: ' + g('name'),
           'Email: ' + g('email'),
+          'Phone: ' + g('phone'),
+          'Country: ' + g('country'),
           'Notes: ' + g('msg'),
           '',
           'Thank you!'
@@ -503,6 +505,7 @@
             departure: lastQuote.departure,
             guests: el.guests ? el.guests.value : 2,
             name: g('name'), email: g('email'),
+            phone: g('phone'), country: g('country'),
             extras: extras, message: el.msg ? el.msg.value : ''
           })
         }).then(function(r){ return r.json(); }).then(function(j){

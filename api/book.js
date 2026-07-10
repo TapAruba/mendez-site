@@ -11,7 +11,8 @@ export default async function handler(req, res) {
   if (typeof b === 'string') { try { b = JSON.parse(b); } catch { b = null; } }
   const DATE = /^\d{4}-\d{2}-\d{2}$/;
   if (!b || !b.apartmentId || !DATE.test(b.arrival || '') || !DATE.test(b.departure || '') ||
-      b.arrival >= b.departure || !b.name || !b.email || !/.+@.+\..+/.test(b.email)) {
+      b.arrival >= b.departure || !b.name || !b.email || !/.+@.+\..+/.test(b.email) ||
+      !b.phone || !String(b.phone).trim() || !b.country || !String(b.country).trim()) {
     return res.status(400).json({ ok: false, error: 'bad params' });
   }
 
@@ -36,6 +37,8 @@ export default async function handler(req, res) {
         firstName,
         lastName,
         email: String(b.email).trim().slice(0, 200),
+        phone: String(b.phone).trim().slice(0, 40),
+        country: String(b.country).trim().slice(0, 80),
         adults: Math.max(1, Math.min(16, Number(b.guests) || 2)),
         children: 0,
         notice: noticeParts.join('\n')
