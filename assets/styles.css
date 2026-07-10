@@ -540,6 +540,7 @@ footer .fl a:hover{color:var(--teal)}
 .cal-d.a{border-radius:10px 0 0 10px}
 .cal-d.b{border-radius:0 10px 10px 0}
 .cal-d.a.b{border-radius:10px}
+.cal-d.booked.b{text-decoration:none;cursor:pointer}
 .cal-foot{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
 .cal-hint{font-family:var(--sans2);font-size:12px;color:var(--ink-soft)}
 .cal-clear{background:none;border:0;font-family:var(--sans2);font-size:12px;color:var(--teal);text-decoration:underline;cursor:pointer}

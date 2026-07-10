@@ -23,6 +23,8 @@ export default async function handler(req, res) {
   const noticeParts = [];
   if (b.extras && b.extras.length) noticeParts.push('Extras requested: ' + [].concat(b.extras).join(', ').slice(0, 300));
   if (b.message) noticeParts.push(String(b.message).slice(0, 800));
+  const est = Number(b.estimate);
+  if (est > 0 && est < 1000000) noticeParts.push('Site estimate shown to guest: $' + est + ' (rates + cleaning + taxes, before any long-stay discount).');
   noticeParts.push('Sent from mendez-site direct booking form.');
 
   try {

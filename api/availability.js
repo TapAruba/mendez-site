@@ -1,6 +1,14 @@
 // Server-side only. Live availability + price for a stay, straight from Smoobu rates.
 // Returns { ok:false, offline:true } until SMOOBU_API_KEY authenticates — the
 // front-end silently stays in "Ana confirms personally" mode in that case.
+
+// Fee structure mirrored from the Smoobu price elements on Ana's direct Website channel.
+// Long-stay discounts are deliberately NOT estimated (their threshold isn't exposed by the
+// API), so the final quote Ana confirms can only come out lower than the site's estimate.
+const CLEANING_FEE = 75;        // USD per stay
+const TOURIST_TAX = 0.125;      // 12.5% of the room rate
+const LODGING_TAX_NIGHT = 3;    // USD per night
+
 export default async function handler(req, res) {
   const key = (process.env.SMOOBU_API_KEY || '').trim();
   const { apartment, arrival, departure } = req.query || {};
@@ -33,11 +41,16 @@ export default async function handler(req, res) {
       d.setUTCDate(d.getUTCDate() + 1);
     }
 
+    const base = priced ? Math.round(total) : null;
+    const taxes = priced ? Math.round(base * TOURIST_TAX + nights * LODGING_TAX_NIGHT) : null;
     res.status(200).json({
       ok: true,
       available: allAvailable && nights >= 1,
       nights,
-      total: priced ? Math.round(total) : null,
+      total: base,
+      cleaning: priced ? CLEANING_FEE : null,
+      taxes,
+      estimate: priced ? base + CLEANING_FEE + taxes : null,
       minStay,
       meetsMinStay: nights >= minStay
     });

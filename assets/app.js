@@ -229,11 +229,17 @@
 
     // --- modern controls: villa pills + guest stepper ---
     var seg = document.getElementById('villaSeg');
+    var GUEST_MAX = { naima: 2, maxwell: 8 };
     if (seg && fel.villa){
       [].forEach.call(seg.querySelectorAll('button'), function(b){
         b.addEventListener('click', function(){
           [].forEach.call(seg.querySelectorAll('button'), function(x){ x.classList.toggle('on', x === b); });
           fel.villa.value = b.dataset.v;
+          if (fel.guests){
+            var mx = GUEST_MAX[villaKey()] || 8;
+            fel.guests.max = mx;
+            if ((parseInt(fel.guests.value, 10) || 2) > mx) fel.guests.value = mx;
+          }
           fel.villa.dispatchEvent(new Event('change'));
         });
       });
@@ -310,11 +316,13 @@
           if (seq !== qSeq) return;                  // a newer check superseded this one
           if (!j || !j.ok){ qBox.hidden = true; return; }
           if (j.available && j.meetsMinStay){
-            lastQuote = { available: true, total: j.total, nights: j.nights, arrival: stay.arrival, departure: stay.departure, apartmentId: id };
+            lastQuote = { available: true, total: j.total, estimate: j.estimate, nights: j.nights, arrival: stay.arrival, departure: stay.departure, apartmentId: id };
+            var money = function(n){ return '$' + n.toLocaleString('en-US'); };
             showQuote('q-ok', 'Available for your dates',
-              j.total ? '$' + j.total.toLocaleString('en-US') + ' <small>total · ' + j.nights + ' night' + (j.nights > 1 ? 's' : '') + '</small>'
-                      : 'Rate confirmed by Ana',
-              'Live from our calendar — your final quote is personally confirmed by Ana.');
+              j.estimate ? money(j.estimate) + ' <small>est. total · ' + j.nights + ' night' + (j.nights > 1 ? 's' : '') + '</small>'
+                         : 'Rate confirmed by Ana',
+              j.estimate ? money(j.total) + ' stay + ' + money(j.cleaning) + ' cleaning + ' + money(j.taxes) + ' Aruba taxes — Ana personally confirms your final quote; longer stays may earn a discount.'
+                         : 'Live from our calendar — your final quote is personally confirmed by Ana.');
           } else if (j.available && !j.meetsMinStay){
             showQuote('q-bad', 'Minimum stay is ' + j.minStay + ' nights', '', 'Add a night or two and check again.');
           } else {
@@ -410,8 +418,13 @@
       }
       cal.addEventListener('click', function(e){
         var b = e.target.closest('.cal-d');
-        if (!b || !b.dataset.d || b.classList.contains('past') || b.classList.contains('booked') || b.classList.contains('off')) return;
+        if (!b || !b.dataset.d || b.classList.contains('past') || b.classList.contains('off')) return;
         var d = fromIso(b.dataset.d);
+        if (b.classList.contains('booked')){
+          // a booked day is still a valid CHECK-OUT: guests leave the morning that booking starts
+          if (selA && !selB && d > selA && nightsFree(selA, d)){ selB = d; sync(); build(); }
+          return;
+        }
         if (!selA || (selA && selB)){ selA = d; selB = null; }
         else if (d <= selA){ selA = d; }
         else if (nightsFree(selA, d)){ selB = d; }
@@ -506,6 +519,7 @@
             guests: el.guests ? el.guests.value : 2,
             name: g('name'), email: g('email'),
             phone: g('phone'), country: g('country'),
+            estimate: lastQuote.estimate || null,
             extras: extras, message: el.msg ? el.msg.value : ''
           })
         }).then(function(r){ return r.json(); }).then(function(j){
