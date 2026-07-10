@@ -184,9 +184,14 @@
   var yr = document.getElementById('yr');
   if (yr) yr.textContent = new Date().getFullYear();
 
-  // ---- Booking form -> pre-filled email or WhatsApp to the host ----
+  // ---- Booking form: live Smoobu availability when the API is up, with a
+  // graceful fall back to the pre-filled email/WhatsApp enquiry when it isn't ----
   var bookForm = document.getElementById('bookForm');
   if (bookForm){
+    var fel = bookForm.elements;
+    // arrivals can't be in the past
+    if (fel.arrival) fel.arrival.min = new Date().toISOString().slice(0, 10);
+
     // pre-tick an extra when arriving from a service card (book-now.html?add=dinner)
     (function(){
       var add = new URLSearchParams(location.search).get('add');
@@ -195,33 +200,152 @@
       if (box){ box.checked = true; var w = box.closest('.chk'); if (w){ w.classList.add('chk-hi'); setTimeout(function(){ w.classList.remove('chk-hi'); }, 2400); } }
       setTimeout(function(){ bookForm.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 250);
     })();
+
+    // --- Smoobu progressive enhancement ---
+    var NAIMA_ID = 1218098; // known; Maxwell is auto-detected from /api/apartments
+    var apiApts = null;     // [{id,name}] once the key authenticates
+    var lastQuote = null;   // {available,total,nights,arrival,departure,apartmentId}
+    var qBox = document.getElementById('quote'), qStatus = document.getElementById('qStatus'),
+        qPrice = document.getElementById('qPrice'), qNote = document.getElementById('qNote');
+
+    fetch('/api/apartments').then(function(r){ return r.json(); }).then(function(j){
+      if (j && j.ok && j.apartments && j.apartments.length){ apiApts = j.apartments; quoteCheck(); }
+    }).catch(function(){});
+
+    function villaKey(){
+      var v = (fel.villa && fel.villa.value || '').toLowerCase();
+      if (v.indexOf('naïma') > -1 || v.indexOf('naima') > -1) return 'naima';
+      if (v.indexOf('maxwell') > -1) return 'maxwell';
+      return null;
+    }
+    function aptId(){
+      var k = villaKey();
+      if (!k || !apiApts) return null;
+      for (var i = 0; i < apiApts.length; i++){
+        var n = (apiApts[i].name || '').toLowerCase();
+        if (k === 'maxwell' && n.indexOf('maxwell') > -1) return apiApts[i].id;
+        if (k === 'naima' && (n.indexOf('naima') > -1 || n.indexOf('naïma') > -1 || n.indexOf('cottage') > -1)) return apiApts[i].id;
+      }
+      return k === 'naima' ? NAIMA_ID : null;
+    }
+    function stayDates(){
+      var a = fel.arrival && fel.arrival.value;
+      var n = parseInt(fel.nights && fel.nights.value, 10);
+      if (!a || !n || n < 1) return null;
+      var d = new Date(a + 'T00:00:00Z');
+      d.setUTCDate(d.getUTCDate() + n);
+      return { arrival: a, departure: d.toISOString().slice(0, 10), nights: n };
+    }
+    function showQuote(cls, status, price, note){
+      if (!qBox) return;
+      qBox.hidden = false;
+      qBox.className = 'quote ' + cls;
+      qStatus.textContent = status;
+      qPrice.innerHTML = price || '';
+      qNote.textContent = note || '';
+    }
+    var qTimer = null, qSeq = 0;
+    function quoteCheck(){
+      lastQuote = null;
+      if (!qBox || !apiApts) return;                 // API offline -> stay silent
+      var id = aptId(), stay = stayDates();
+      if (!id || !stay){ qBox.hidden = true; return; }
+      var seq = ++qSeq;
+      showQuote('q-wait', 'Checking availability…', '', '');
+      fetch('/api/availability?apartment=' + id + '&arrival=' + stay.arrival + '&departure=' + stay.departure)
+        .then(function(r){ return r.json(); })
+        .then(function(j){
+          if (seq !== qSeq) return;                  // a newer check superseded this one
+          if (!j || !j.ok){ qBox.hidden = true; return; }
+          if (j.available && j.meetsMinStay){
+            lastQuote = { available: true, total: j.total, nights: j.nights, arrival: stay.arrival, departure: stay.departure, apartmentId: id };
+            showQuote('q-ok', 'Available for your dates',
+              j.total ? '$' + j.total.toLocaleString('en-US') + ' <small>total · ' + j.nights + ' night' + (j.nights > 1 ? 's' : '') + '</small>'
+                      : 'Rate confirmed by Ana',
+              'Live from our calendar — your final quote is personally confirmed by Ana.');
+          } else if (j.available && !j.meetsMinStay){
+            showQuote('q-bad', 'Minimum stay is ' + j.minStay + ' nights', '', 'Add a night or two and check again.');
+          } else {
+            showQuote('q-bad', 'Those dates look taken', '', 'Try shifting your dates — or send the enquiry and Ana will suggest alternatives.');
+          }
+        }).catch(function(){ if (seq === qSeq) qBox.hidden = true; });
+    }
+    ['villa', 'arrival', 'nights'].forEach(function(n){
+      if (fel[n]) fel[n].addEventListener('change', function(){ clearTimeout(qTimer); qTimer = setTimeout(quoteCheck, 350); });
+    });
+
+    function showSent(direct){
+      var title = document.getElementById('bsTitle'), text = document.getElementById('bsText'),
+          actions = document.getElementById('bsActions');
+      if (direct){
+        if (title) title.textContent = 'Request sent — you’re almost there!';
+        if (text) text.textContent = 'Your dates are reserved as a request in our calendar. Ana will confirm personally by email with a secure payment link — nothing is charged until then.';
+        if (actions) actions.style.display = 'none';
+      } else {
+        if (title) title.textContent = 'Your enquiry is ready';
+        if (text) text.textContent = 'Send it straight to Ana — she replies personally to confirm availability.';
+        if (actions) actions.style.display = '';
+      }
+      bookForm.hidden = true;
+      var sent = document.getElementById('bookSent');
+      if (sent){ sent.hidden = false; sent.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    }
+
     bookForm.addEventListener('submit', function(e){
       e.preventDefault();
       var el = this.elements;
       var g = function(n){ var v = el[n] ? String(el[n].value).trim() : ''; return v || '—'; };
       var extras = [].slice.call(this.querySelectorAll('input[name="extra"]:checked')).map(function(c){ return c.value; });
-      var subject = 'Booking enquiry — ' + g('villa');
-      var body = [
-        'Hi Ana, I would like to check availability for a stay at Mendez Estates.',
-        '',
-        'Villa: ' + g('villa'),
-        'Arrival: ' + g('arrival'),
-        'Nights: ' + g('nights'),
-        'Guests: ' + g('guests'),
-        'Extras: ' + (extras.length ? extras.join(', ') : 'None'),
-        'Name: ' + g('name'),
-        'Email: ' + g('email'),
-        'Notes: ' + g('msg'),
-        '',
-        'Thank you!'
-      ].join('\n');
-      var mail = document.getElementById('bsMail'), wa = document.getElementById('bsWa');
-      if (mail) mail.href = 'mailto:mendezestatesaruba@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-      if (wa) wa.href = 'https://wa.me/2975922325?text=' + encodeURIComponent(body);
-      bookForm.hidden = true;
-      var sent = document.getElementById('bookSent');
-      if (sent){ sent.hidden = false; sent.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+
+      var composeFallback = function(){
+        var subject = 'Booking enquiry — ' + g('villa');
+        var body = [
+          'Hi Ana, I would like to check availability for a stay at Mendez Estates.',
+          '',
+          'Villa: ' + g('villa'),
+          'Arrival: ' + g('arrival'),
+          'Nights: ' + g('nights'),
+          'Guests: ' + g('guests'),
+          'Extras: ' + (extras.length ? extras.join(', ') : 'None'),
+          'Name: ' + g('name'),
+          'Email: ' + g('email'),
+          'Notes: ' + g('msg'),
+          '',
+          'Thank you!'
+        ].join('\n');
+        var mail = document.getElementById('bsMail'), wa = document.getElementById('bsWa');
+        if (mail) mail.href = 'mailto:mendezestatesaruba@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+        if (wa) wa.href = 'https://wa.me/2975922325?text=' + encodeURIComponent(body);
+        showSent(false);
+      };
+
+      // direct request-to-book when the live calendar confirmed the dates
+      if (lastQuote && lastQuote.available && lastQuote.apartmentId){
+        var btn = bookForm.querySelector('button[type="submit"]');
+        if (btn){ btn.disabled = true; btn.textContent = 'Sending…'; }
+        fetch('/api/book', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            apartmentId: lastQuote.apartmentId,
+            arrival: lastQuote.arrival,
+            departure: lastQuote.departure,
+            guests: el.guests ? el.guests.value : 2,
+            name: g('name'), email: g('email'),
+            extras: extras, message: el.msg ? el.msg.value : ''
+          })
+        }).then(function(r){ return r.json(); }).then(function(j){
+          if (btn){ btn.disabled = false; btn.textContent = 'Request availability'; }
+          if (j && j.ok) showSent(true); else composeFallback();
+        }).catch(function(){
+          if (btn){ btn.disabled = false; btn.textContent = 'Request availability'; }
+          composeFallback();
+        });
+        return;
+      }
+      composeFallback();
     });
+
     var back = document.getElementById('bsBack');
     if (back) back.addEventListener('click', function(){
       var sent = document.getElementById('bookSent'); if (sent) sent.hidden = true;

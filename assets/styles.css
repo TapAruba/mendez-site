@@ -434,20 +434,21 @@ form .btn--fill:hover{background:var(--ocean);border-color:var(--ocean);color:#f
 .bs-back:hover{color:var(--ink)}
 
 /* CTA band */
-.cta-band{position:relative;overflow:hidden;text-align:center;color:#fff;background:var(--navy)}
+/* light veil over the photo — bright like the rest of the site, photo texture ghosting through */
+.cta-band{position:relative;overflow:hidden;text-align:center;color:var(--ink);background:var(--sand)}
 .cta-band>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.cta-band::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,30,36,.72),rgba(10,30,36,.8))}
+.cta-band::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(242,236,226,.88),rgba(251,248,241,.94))}
 .cta-band .wrap{position:relative;z-index:2}
 .cta-band .eyebrow{color:var(--acc)}
-.cta-band h2{font-size:clamp(30px,4.4vw,50px);color:#fff;margin:14px 0 22px}
-.cta-band p{color:rgba(255,255,255,.86);font-size:17px;max-width:540px;margin:0 auto 32px}
+.cta-band h2{font-size:clamp(30px,4.4vw,50px);color:var(--ink);margin:14px 0 22px}
+.cta-band p{color:var(--ink-soft);font-size:17px;max-width:540px;margin:0 auto 32px}
 
-footer{background:#081619;color:rgba(255,255,255,.6);padding:56px 0 30px;text-align:center;font-size:13px}
-footer .logo{color:#fff;font-family:var(--serif);font-size:24px;font-weight:600;display:inline-block;margin-bottom:14px}
-footer .logo small{display:block;font-family:var(--sans);font-size:9px;letter-spacing:.34em;text-transform:uppercase;font-weight:400;opacity:.7;margin-top:-2px}
+footer{background:var(--sand);color:var(--ink-soft);border-top:1px solid var(--line);padding:56px 0 30px;text-align:center;font-size:13px}
+footer .logo{color:var(--ink);font-family:var(--serif);font-size:24px;font-weight:600;display:inline-block;margin-bottom:14px}
+footer .logo small{display:block;font-family:var(--sans);font-size:9px;letter-spacing:.34em;text-transform:uppercase;font-weight:400;opacity:.65;margin-top:-2px}
 footer .fl{display:flex;gap:22px;justify-content:center;margin:18px 0;flex-wrap:wrap}
-footer .fl a{color:rgba(255,255,255,.7);font-size:13px;letter-spacing:.08em}
-footer .fl a:hover{color:var(--gold)}
+footer .fl a{color:var(--ink-soft);font-size:13px;letter-spacing:.08em}
+footer .fl a:hover{color:var(--teal)}
 .made{margin-top:20px;font-size:11px;letter-spacing:.12em;opacity:.5}
 
 /* lightbox */
@@ -495,3 +496,14 @@ footer .fl a:hover{color:var(--gold)}
   .mark{padding:22px 18px 20px}
   .gallery{grid-template-columns:repeat(3,1fr)}
 }
+
+/* live availability quote (Smoobu) — silent until the API authenticates */
+.quote{border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:14px;background:#fff;padding:16px 18px;margin:2px 0 18px;box-shadow:0 4px 16px rgba(27,37,40,.05)}
+.quote .q-status{font-family:var(--sans2);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal)}
+.quote .q-price{font-family:var(--serif);font-size:24px;color:var(--ink);margin-top:4px}
+.quote .q-price small{font-family:var(--sans);font-size:13px;color:var(--ink-soft)}
+.quote .q-note{font-size:12.5px;color:var(--ink-soft);margin-top:4px}
+.quote.q-ok{border-left-color:#5DAE8B}
+.quote.q-bad{border-left-color:#C97B5D}
+.quote.q-bad .q-status{color:#B25F41}
+.quote.q-wait .q-status{color:var(--ink-soft)}
