@@ -184,6 +184,34 @@
   var yr = document.getElementById('yr');
   if (yr) yr.textContent = new Date().getFullYear();
 
+  // ---- In-page booking modal (villa pages) — "Check dates" opens the booking
+  // right here instead of navigating away; the links keep book-now.html as a
+  // no-JS fallback ----
+  var bkm = document.getElementById('bkm');
+  if (bkm){
+    var bkmPanel = bkm.querySelector('.bkm-panel');
+    var bkmShow = function(){
+      bkm.hidden = false;
+      document.body.classList.add('bkm-lock');
+      if (bkmPanel) bkmPanel.scrollTop = 0;
+      requestAnimationFrame(function(){ bkm.classList.add('on'); });
+    };
+    var bkmHide = function(){
+      bkm.classList.remove('on');
+      document.body.classList.remove('bkm-lock');
+      setTimeout(function(){ bkm.hidden = true; }, 380);
+    };
+    document.querySelectorAll('[data-bkm-open]').forEach(function(a){
+      a.addEventListener('click', function(e){ e.preventDefault(); bkmShow(); });
+    });
+    bkm.querySelectorAll('[data-bkm-close]').forEach(function(x){
+      x.addEventListener('click', bkmHide);
+    });
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape' && !bkm.hidden) bkmHide();
+    });
+  }
+
   // ---- Booking form: live Smoobu availability when the API is up, with a
   // graceful fall back to the pre-filled email/WhatsApp enquiry when it isn't ----
   var bookForm = document.getElementById('bookForm');
@@ -213,7 +241,8 @@
     var gm = document.getElementById('gMinus'), gp = document.getElementById('gPlus');
     if (gm && gp && fel.guests){
       var bump = function(d){
-        var v = Math.max(1, Math.min(8, (parseInt(fel.guests.value, 10) || 2) + d));
+        var mx = parseInt(fel.guests.max, 10) || 8;
+        var v = Math.max(1, Math.min(mx, (parseInt(fel.guests.value, 10) || 2) + d));
         fel.guests.value = v;
       };
       gm.addEventListener('click', function(){ bump(-1); });
