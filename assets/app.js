@@ -189,8 +189,6 @@
   var bookForm = document.getElementById('bookForm');
   if (bookForm){
     var fel = bookForm.elements;
-    // arrivals can't be in the past
-    if (fel.arrival) fel.arrival.min = new Date().toISOString().slice(0, 10);
 
     // pre-tick an extra when arriving from a service card (book-now.html?add=dinner)
     (function(){
@@ -201,6 +199,27 @@
       setTimeout(function(){ bookForm.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 250);
     })();
 
+    // --- modern controls: villa pills + guest stepper ---
+    var seg = document.getElementById('villaSeg');
+    if (seg && fel.villa){
+      [].forEach.call(seg.querySelectorAll('button'), function(b){
+        b.addEventListener('click', function(){
+          [].forEach.call(seg.querySelectorAll('button'), function(x){ x.classList.toggle('on', x === b); });
+          fel.villa.value = b.dataset.v;
+          fel.villa.dispatchEvent(new Event('change'));
+        });
+      });
+    }
+    var gm = document.getElementById('gMinus'), gp = document.getElementById('gPlus');
+    if (gm && gp && fel.guests){
+      var bump = function(d){
+        var v = Math.max(1, Math.min(8, (parseInt(fel.guests.value, 10) || 2) + d));
+        fel.guests.value = v;
+      };
+      gm.addEventListener('click', function(){ bump(-1); });
+      gp.addEventListener('click', function(){ bump(1); });
+    }
+
     // --- Smoobu progressive enhancement ---
     var NAIMA_ID = 1218098; // known; Maxwell is auto-detected from /api/apartments
     var apiApts = null;     // [{id,name}] once the key authenticates
@@ -208,8 +227,12 @@
     var qBox = document.getElementById('quote'), qStatus = document.getElementById('qStatus'),
         qPrice = document.getElementById('qPrice'), qNote = document.getElementById('qNote');
 
+    var calRefresh = null; // assigned by the calendar below; called once the API wakes up
     fetch('/api/apartments').then(function(r){ return r.json(); }).then(function(j){
-      if (j && j.ok && j.apartments && j.apartments.length){ apiApts = j.apartments; quoteCheck(); }
+      if (j && j.ok && j.apartments && j.apartments.length){
+        apiApts = j.apartments; quoteCheck();
+        if (calRefresh) calRefresh();
+      }
     }).catch(function(){});
 
     function villaKey(){
@@ -274,6 +297,118 @@
       if (fel[n]) fel[n].addEventListener('change', function(){ clearTimeout(qTimer); qTimer = setTimeout(quoteCheck, 350); });
     });
 
+    // --- date-range calendar (Airbnb-style; booked days shade in once Smoobu is live) ---
+    (function(){
+      var cal = document.getElementById('cal'), btn = document.getElementById('datesBtn');
+      if (!cal || !btn) return;
+      var label = document.getElementById('datesLabel'), hint = document.getElementById('calHint');
+      var t1 = document.getElementById('calT1'), t2 = document.getElementById('calT2');
+      var m1 = document.getElementById('calM1'), m2 = document.getElementById('calM2');
+      var MN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      var WD = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+      var today = new Date(); today.setHours(0,0,0,0);
+      var view = new Date(today.getFullYear(), today.getMonth(), 1);
+      var selA = null, selB = null;
+      var avail = {};        // iso -> true/false (only once the API is live)
+      var loaded = {};       // 'aptId:iso-from' -> true
+
+      function iso(d){ return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+      function fromIso(s){ var p = s.split('-'); return new Date(+p[0], +p[1]-1, +p[2]); }
+
+      function renderMonth(el, base){
+        var html = WD.map(function(w){ return '<span class="wd">' + w + '</span>'; }).join('');
+        var first = new Date(base.getFullYear(), base.getMonth(), 1);
+        var days = new Date(base.getFullYear(), base.getMonth()+1, 0).getDate();
+        for (var i = 0; i < first.getDay(); i++) html += '<button type="button" class="cal-d off" tabindex="-1"></button>';
+        for (var d = 1; d <= days; d++){
+          var dt = new Date(base.getFullYear(), base.getMonth(), d);
+          var k = iso(dt), cls = 'cal-d';
+          if (dt < today) cls += ' past';
+          else if (avail[k] === false) cls += ' booked';
+          if (selA && k === iso(selA)) cls += ' a';
+          if (selB && k === iso(selB)) cls += ' b';
+          if (selA && selB && dt > selA && dt < selB) cls += ' in';
+          html += '<button type="button" class="' + cls + '" data-d="' + k + '">' + d + '</button>';
+        }
+        el.innerHTML = html;
+      }
+      function build(){
+        t1.textContent = MN[view.getMonth()] + ' ' + view.getFullYear();
+        var v2 = new Date(view.getFullYear(), view.getMonth()+1, 1);
+        t2.textContent = MN[v2.getMonth()] + ' ' + v2.getFullYear();
+        renderMonth(m1, view); renderMonth(m2, v2);
+      }
+      function fetchMonths(){
+        if (!apiApts) return;
+        var id = aptId(); if (!id) return;
+        var from = iso(view);
+        var key = id + ':' + from;
+        if (loaded[key]) return;
+        loaded[key] = true;
+        var to = iso(new Date(view.getFullYear(), view.getMonth()+2, 1));
+        fetch('/api/calendar?apartment=' + id + '&from=' + from + '&to=' + to)
+          .then(function(r){ return r.json(); })
+          .then(function(j){
+            if (j && j.ok && j.days){ Object.keys(j.days).forEach(function(k){ avail[k] = j.days[k]; }); build(); }
+          }).catch(function(){});
+      }
+      calRefresh = fetchMonths;
+
+      function nightsFree(a, b){
+        var d = new Date(a);
+        while (d < b){ if (avail[iso(d)] === false) return false; d.setDate(d.getDate()+1); }
+        return true;
+      }
+      function sync(){
+        if (selA && selB){
+          var n = Math.round((selB - selA) / 86400000);
+          fel.arrival.value = iso(selA);
+          fel.nights.value = n;
+          var f = function(d){ return d.toLocaleDateString('en-US', { month:'short', day:'numeric' }); };
+          label.textContent = f(selA) + ' → ' + f(selB) + ' · ' + n + ' night' + (n > 1 ? 's' : '');
+          btn.classList.remove('empty','attn');
+          fel.arrival.dispatchEvent(new Event('change'));
+          setTimeout(function(){ cal.hidden = true; }, 420);
+        } else {
+          fel.arrival.value = ''; fel.nights.value = '';
+          label.textContent = selA
+            ? selA.toLocaleDateString('en-US', { month:'short', day:'numeric' }) + ' → select check-out'
+            : 'Add your dates';
+          btn.classList.toggle('empty', !selA);
+          var q = document.getElementById('quote'); if (q) q.hidden = true;
+        }
+        if (hint) hint.textContent = !selA ? 'Select your check-in day' : (!selB ? 'Now pick your check-out day' : 'Looks good — you can adjust any time');
+      }
+      cal.addEventListener('click', function(e){
+        var b = e.target.closest('.cal-d');
+        if (!b || !b.dataset.d || b.classList.contains('past') || b.classList.contains('booked') || b.classList.contains('off')) return;
+        var d = fromIso(b.dataset.d);
+        if (!selA || (selA && selB)){ selA = d; selB = null; }
+        else if (d <= selA){ selA = d; }
+        else if (nightsFree(selA, d)){ selB = d; }
+        else { selA = d; selB = null; }
+        sync(); build();
+      });
+      btn.addEventListener('click', function(){
+        cal.hidden = !cal.hidden;
+        if (!cal.hidden){ build(); fetchMonths(); }
+      });
+      document.getElementById('calPrev').addEventListener('click', function(){
+        var prev = new Date(view.getFullYear(), view.getMonth()-1, 1);
+        if (prev < new Date(today.getFullYear(), today.getMonth(), 1)) return;
+        view = prev; build(); fetchMonths();
+      });
+      document.getElementById('calNext').addEventListener('click', function(){
+        view = new Date(view.getFullYear(), view.getMonth()+1, 1); build(); fetchMonths();
+      });
+      document.getElementById('calClear').addEventListener('click', function(){ selA = selB = null; sync(); build(); });
+      if (fel.villa) fel.villa.addEventListener('change', function(){
+        avail = {}; loaded = {}; build(); if (!cal.hidden) fetchMonths();
+      });
+      btn.classList.add('empty');
+      sync(); build();
+    })();
+
     function showSent(direct){
       var title = document.getElementById('bsTitle'), text = document.getElementById('bsText'),
           actions = document.getElementById('bsActions');
@@ -294,6 +429,13 @@
     bookForm.addEventListener('submit', function(e){
       e.preventDefault();
       var el = this.elements;
+      // dates come from the calendar — nudge it open if the guest skipped it
+      if (!el.arrival || !el.arrival.value){
+        var db = document.getElementById('datesBtn'), c = document.getElementById('cal');
+        if (c) c.hidden = false;
+        if (db){ db.classList.add('attn'); setTimeout(function(){ db.classList.remove('attn'); }, 2200); db.scrollIntoView({ behavior:'smooth', block:'center' }); }
+        return;
+      }
       var g = function(n){ var v = el[n] ? String(el[n].value).trim() : ''; return v || '—'; };
       var extras = [].slice.call(this.querySelectorAll('input[name="extra"]:checked')).map(function(c){ return c.value; });
 

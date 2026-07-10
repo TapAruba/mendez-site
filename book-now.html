@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="assets/styles.css?v=22" />
+<link rel="stylesheet" href="assets/styles.css?v=23" />
 <link rel="icon" type="image/png" href="assets/img/favicon.png?v=3" />
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png?v=3" />
 <meta name="theme-color" content="#F2ECE2" />
@@ -99,12 +99,45 @@
 
       <form id="bookForm">
         <div class="row">
-          <div class="field"><label>Villa</label><select name="villa"><option>Maxwell (private pool)</option><option>Naïma (for two)</option><option>Not sure yet</option></select></div>
-          <div class="field"><label>Guests</label><input name="guests" type="number" min="1" placeholder="2" /></div>
+          <div class="field"><label>Villa</label>
+            <div class="seg" id="villaSeg" role="group" aria-label="Choose a villa">
+              <button type="button" class="on" data-v="Maxwell (private pool)">Maxwell</button>
+              <button type="button" data-v="Naïma (for two)">Naïma</button>
+              <button type="button" data-v="Not sure yet">Not sure</button>
+            </div>
+            <input type="hidden" name="villa" value="Maxwell (private pool)" />
+          </div>
+          <div class="field"><label>Guests</label>
+            <div class="stepper">
+              <button type="button" id="gMinus" aria-label="Fewer guests">&minus;</button>
+              <input name="guests" type="number" min="1" max="8" value="2" readonly aria-live="polite" />
+              <button type="button" id="gPlus" aria-label="More guests">+</button>
+            </div>
+          </div>
         </div>
-        <div class="row">
-          <div class="field"><label>Arrival</label><input name="arrival" type="date" required /></div>
-          <div class="field"><label>Nights</label><input name="nights" type="number" min="1" placeholder="5" /></div>
+        <div class="field">
+          <label>Your dates</label>
+          <button type="button" class="dates-btn" id="datesBtn">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+            <span id="datesLabel">Add your dates</span>
+          </button>
+          <input type="hidden" name="arrival" />
+          <input type="hidden" name="nights" />
+          <div class="cal" id="cal" hidden>
+            <div class="cal-head">
+              <button type="button" class="cal-nav" id="calPrev" aria-label="Previous month">&#8249;</button>
+              <div class="cal-titles"><span id="calT1"></span><span id="calT2" class="cal-t2"></span></div>
+              <button type="button" class="cal-nav" id="calNext" aria-label="Next month">&#8250;</button>
+            </div>
+            <div class="cal-months">
+              <div class="cal-month" id="calM1"></div>
+              <div class="cal-month cal-m2" id="calM2"></div>
+            </div>
+            <div class="cal-foot">
+              <span class="cal-hint" id="calHint">Select your check-in day</span>
+              <button type="button" class="cal-clear" id="calClear">Clear</button>
+            </div>
+          </div>
         </div>
         <div class="quote" id="quote" hidden>
           <div class="q-status" id="qStatus"></div>
@@ -152,6 +185,6 @@
 </footer>
 
 <div class="lb" id="lb"><span class="x">&times;</span><img id="lbImg" src="" alt="" /></div>
-<script src="assets/app.js?v=16"></script>
+<script src="assets/app.js?v=17"></script>
 </body>
 </html>
