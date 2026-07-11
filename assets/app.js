@@ -484,7 +484,7 @@
       var composeFallback = function(){
         var subject = 'Booking enquiry — ' + g('villa');
         var body = [
-          'Hi Ana, I would like to check availability for a stay at Mendez Estates.',
+          'Hi Ana, I would like to check availability for a stay at Méndez Estates.',
           '',
           'Villa: ' + g('villa'),
           'Arrival: ' + g('arrival'),
@@ -540,4 +540,58 @@
       bookForm.hidden = false; bookForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
   }
+})();
+
+// ---- clickable hero stats: smooth scroll to their section ----
+(function(){
+  var links = document.querySelectorAll('.stats a[href^="#"]');
+  for (var i = 0; i < links.length; i++) (function(a){
+    a.addEventListener('click', function(e){
+      var el = document.querySelector(a.getAttribute('href'));
+      if (!el) return;
+      e.preventDefault();
+      var y = el.getBoundingClientRect().top + window.pageYOffset - 66;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    });
+  })(links[i]);
+})();
+
+// ---- service inquiry forms (Private Chef / Massage / Island Tours) ----
+// Independent from the property booking flow: composes an email straight to Ana.
+(function(){
+  var LABELS = { name:'Name', email:'Email', phone:'Phone', date:'Preferred date',
+                 occasion:'Occasion', msg:'Message', location:'Location',
+                 tour:'Desired tour', guests:'Number of guests', requests:'Special requests' };
+  var forms = document.querySelectorAll('form[data-inquiry]');
+  for (var i = 0; i < forms.length; i++) (function(fm){
+    fm.addEventListener('submit', function(e){
+      e.preventDefault();
+      var need = fm.querySelectorAll('[required]');
+      for (var r = 0; r < need.length; r++){
+        if (!String(need[r].value).trim()){ need[r].focus(); return; }
+      }
+      var svc = fm.getAttribute('data-inquiry');
+      var lines = [svc + ' inquiry — sent from mendezestatesaruba.com', ''];
+      var seen = {};
+      var fields = fm.querySelectorAll('input,textarea,select');
+      for (var j = 0; j < fields.length; j++){
+        var f = fields[j], k = f.name;
+        if (!k || seen[k]) continue;
+        if (f.type === 'radio'){
+          var on = fm.querySelector('input[name="' + k + '"]:checked');
+          if (on){ lines.push((LABELS[k] || k) + ': ' + on.value); seen[k] = 1; }
+          continue;
+        }
+        if (String(f.value).trim()){ lines.push((LABELS[k] || k) + ': ' + f.value.trim()); seen[k] = 1; }
+      }
+      lines.push('', 'Thank you!');
+      var body = lines.join('\n');
+      var nameV = fm.querySelector('input[name="name"]');
+      var subject = svc + ' inquiry' + (nameV && nameV.value.trim() ? ' — ' + nameV.value.trim() : '');
+      var note = fm.querySelector('.inq-note'), wa = fm.querySelector('.inq-wa');
+      if (wa) wa.href = 'https://wa.me/2975922325?text=' + encodeURIComponent(body);
+      if (note) note.hidden = false;
+      window.location.href = 'mailto:mendezestatesaruba@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+    });
+  })(forms[i]);
 })();
