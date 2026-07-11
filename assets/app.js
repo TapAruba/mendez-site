@@ -542,15 +542,17 @@
   }
 })();
 
-// ---- reviews: show-all expander ----
+// ---- reviews: show-more expander (batches of 9) ----
 (function(){
   var b = document.getElementById('rvMoreBtn');
   if (!b) return;
   b.addEventListener('click', function(){
-    var rest = document.getElementById('reviewsRest');
-    if (rest) rest.hidden = false;
-    var w = document.getElementById('rvMoreWrap');
-    if (w) w.parentNode.removeChild(w);
+    var hiddenCards = document.querySelectorAll('#reviewGrid .review-card[hidden]');
+    for (var i = 0; i < hiddenCards.length && i < 9; i++) hiddenCards[i].hidden = false;
+    if (document.querySelectorAll('#reviewGrid .review-card[hidden]').length === 0){
+      var w = document.getElementById('rvMoreWrap');
+      if (w) w.parentNode.removeChild(w);
+    }
   });
 })();
 
