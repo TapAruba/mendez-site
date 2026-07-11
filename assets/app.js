@@ -542,6 +542,18 @@
   }
 })();
 
+// ---- reviews: show-all expander ----
+(function(){
+  var b = document.getElementById('rvMoreBtn');
+  if (!b) return;
+  b.addEventListener('click', function(){
+    var rest = document.getElementById('reviewsRest');
+    if (rest) rest.hidden = false;
+    var w = document.getElementById('rvMoreWrap');
+    if (w) w.parentNode.removeChild(w);
+  });
+})();
+
 // ---- clickable hero stats: smooth scroll to their section ----
 (function(){
   var links = document.querySelectorAll('.stats a[href^="#"]');
