@@ -542,16 +542,27 @@
   }
 })();
 
-// ---- reviews: show-more expander (batches of 9) ----
+// ---- reviews: show-more (batches of 9) / show-less expander ----
 (function(){
   var b = document.getElementById('rvMoreBtn');
   if (!b) return;
   b.addEventListener('click', function(){
+    var all = document.querySelectorAll('#reviewGrid .review-card');
     var hiddenCards = document.querySelectorAll('#reviewGrid .review-card[hidden]');
-    for (var i = 0; i < hiddenCards.length && i < 9; i++) hiddenCards[i].hidden = false;
+    if (hiddenCards.length === 0){
+      // collapse back to the first 3
+      for (var i = 3; i < all.length; i++) all[i].hidden = true;
+      b.textContent = 'Show more reviews';
+      var sec = document.getElementById('reviews');
+      if (sec){
+        var y = sec.getBoundingClientRect().top + window.pageYOffset - 66;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+      return;
+    }
+    for (var k = 0; k < hiddenCards.length && k < 9; k++) hiddenCards[k].hidden = false;
     if (document.querySelectorAll('#reviewGrid .review-card[hidden]').length === 0){
-      var w = document.getElementById('rvMoreWrap');
-      if (w) w.parentNode.removeChild(w);
+      b.textContent = 'Show less';
     }
   });
 })();
