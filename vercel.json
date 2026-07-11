@@ -17,10 +17,10 @@
     { "source": "/booking", "destination": "/book-now.html", "permanent": true },
     { "source": "/contact", "destination": "/book-now.html", "permanent": true },
     { "source": "/naima-luxury", "destination": "/naima.html", "permanent": true },
-    { "source": "/copy-of-naima-luxury", "destination": "/naima.html", "permanent": true },
+    { "source": "/copy-of-naima-luxury", "destination": "/maxwell.html", "permanent": true },
     { "source": "/maxwell-luxury", "destination": "/maxwell.html", "permanent": true },
     { "source": "/copy-of-maxwell-luxury", "destination": "/maxwell.html", "permanent": true },
-    { "source": "/s-projects-basic", "destination": "/the-property.html", "permanent": true },
+    { "source": "/s-projects-basic", "destination": "/naima.html", "permanent": true },
 
     { "source": "/car-rental", "destination": "/car-rental.html", "permanent": true },
     { "source": "/about", "destination": "/about.html", "permanent": true },
