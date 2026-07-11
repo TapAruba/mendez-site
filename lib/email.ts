@@ -1,8 +1,14 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 const TO = "mendezestatesaruba@gmail.com";
-const FROM = process.env.EMAIL_FROM ?? "noreply@mendezestatesaruba.com";
+
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
+
+function getFrom() {
+  return process.env.EMAIL_FROM ?? "noreply@mendezestatesaruba.com";
+}
 
 export async function sendBookingConfirmation(data: {
   guestName: string;
@@ -28,6 +34,9 @@ export async function sendBookingConfirmation(data: {
       <tr><td><b>Message</b></td><td>${data.message ?? "—"}</td></tr>
     </table>
   `;
+
+  const resend = getResend();
+  const FROM = getFrom();
 
   await resend.emails.send({
     from: FROM,
@@ -57,6 +66,9 @@ export async function sendServiceInquiry(serviceType: string, fields: Record<str
     .map(([k, v]) => `<tr><td><b>${k}</b></td><td>${v}</td></tr>`)
     .join("");
   const html = `<h2>Service Inquiry — ${label}</h2><table border="1" cellpadding="6" cellspacing="0">${rows}</table>`;
+
+  const resend = getResend();
+  const FROM = getFrom();
 
   await resend.emails.send({
     from: FROM,
