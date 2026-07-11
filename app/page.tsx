@@ -41,21 +41,23 @@ export default function HomePage() {
       <section className="bg-cream py-14">
         <div className="mx-auto grid max-w-5xl grid-cols-2 gap-8 px-6 text-center md:grid-cols-4">
           {[
-            ["2", "Private Villas"],
-            ["1", "Garden Pool"],
-            ["24/7", "WhatsApp Concierge"],
-            ["5★", "Guest Reviews"],
-          ].map(([stat, label]) => (
+            ["2", "Private Villas", "#properties"],
+            ["1", "Garden Pool", "#amenities"],
+            ["24/7", "WhatsApp Concierge", "#contact"],
+            ["5★", "Guest Reviews", "#reviews"],
+          ].map(([stat, label, href]) => (
             <Reveal key={label}>
-              <div className="font-display text-4xl text-navy">{stat}</div>
-              <div className="mt-1 font-sans text-[10px] uppercase tracking-[0.16em] text-caribbean">{label}</div>
+              <a href={href} className="block cursor-pointer transition-opacity hover:opacity-75">
+                <div className="font-display text-4xl text-navy">{stat}</div>
+                <div className="mt-1 font-sans text-[10px] uppercase tracking-[0.16em] text-caribbean">{label}</div>
+              </a>
             </Reveal>
           ))}
         </div>
       </section>
 
       {/* SERVICES PREVIEW */}
-      <section className="bg-white py-28">
+      <section id="properties" className="bg-white py-28">
         <div className="mx-auto max-w-7xl px-6 md:px-10">
           <Reveal>
             <div className="mx-auto max-w-2xl text-center">
@@ -88,7 +90,7 @@ export default function HomePage() {
       </section>
 
       {/* AUTHENTIC TOUCH */}
-      <section className="relative overflow-hidden bg-cream py-28">
+      <section id="amenities" className="relative overflow-hidden bg-cream py-28">
         <div className="mx-auto flex max-w-7xl flex-col gap-24 px-6 md:px-10">
           {/* Row 1 */}
           <div className="grid grid-cols-1 items-center gap-16 lg:grid-cols-12 lg:gap-20">
@@ -159,7 +161,7 @@ export default function HomePage() {
       </section>
 
       {/* TESTIMONIAL */}
-      <section className="bg-white py-28">
+      <section id="reviews" className="bg-white py-28">
         <Reveal className="mx-auto max-w-3xl px-6 text-center">
           <div className="font-display text-3xl italic leading-relaxed text-navy/85 md:text-4xl">
             &quot;Everything was very clean and organized as described... Ana was very attentive and helped us with what we needed.&quot;
@@ -169,7 +171,7 @@ export default function HomePage() {
       </section>
 
       {/* FINAL CTA */}
-      <section className="bg-cream py-28">
+      <section id="contact" className="bg-cream py-28">
         <Reveal className="mx-auto max-w-3xl px-6 text-center">
           <div className="font-sans text-[11px] uppercase tracking-[0.2em] text-gold">— Reservations</div>
           <h2 className="mt-5 font-display text-[clamp(2.25rem,5vw,4rem)] leading-tight text-navy">
