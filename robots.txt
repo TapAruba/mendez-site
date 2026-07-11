@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://mendezestatesaruba.com/sitemap.xml

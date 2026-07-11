@@ -1,0 +1,47 @@
+{
+  "redirects": [
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "www.mendezestatesaruba.com" }],
+      "destination": "https://mendezestatesaruba.com/",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "mendez-site.vercel.app" }],
+      "destination": "https://mendezestatesaruba.com/",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.mendezestatesaruba.com" }],
+      "destination": "https://mendezestatesaruba.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "mendez-site.vercel.app" }],
+      "destination": "https://mendezestatesaruba.com/:path*",
+      "permanent": true
+    },
+
+    { "source": "/book-online", "destination": "/book-now.html", "permanent": true },
+    { "source": "/booking", "destination": "/book-now.html", "permanent": true },
+    { "source": "/contact", "destination": "/book-now.html", "permanent": true },
+    { "source": "/naima-luxury", "destination": "/naima.html", "permanent": true },
+    { "source": "/copy-of-naima-luxury", "destination": "/maxwell.html", "permanent": true },
+    { "source": "/maxwell-luxury", "destination": "/maxwell.html", "permanent": true },
+    { "source": "/copy-of-maxwell-luxury", "destination": "/maxwell.html", "permanent": true },
+    { "source": "/s-projects-basic", "destination": "/naima.html", "permanent": true },
+
+    { "source": "/car-rental", "destination": "/car-rental.html", "permanent": true },
+    { "source": "/about", "destination": "/about.html", "permanent": true },
+    { "source": "/services", "destination": "/services.html", "permanent": true },
+    { "source": "/policies", "destination": "/policies.html", "permanent": true },
+    { "source": "/the-property", "destination": "/the-property.html", "permanent": true },
+    { "source": "/naima", "destination": "/naima.html", "permanent": true },
+    { "source": "/maxwell", "destination": "/maxwell.html", "permanent": true },
+    { "source": "/book-now", "destination": "/book-now.html", "permanent": true },
+    { "source": "/index", "destination": "/", "permanent": true }
+  ]
+}
