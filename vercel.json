@@ -1,0 +1,16 @@
+{
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.mendezestatesaruba.com" }],
+      "destination": "https://mendezestatesaruba.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "mendez-site.vercel.app" }],
+      "destination": "https://mendezestatesaruba.com/:path*",
+      "permanent": true
+    }
+  ]
+}
