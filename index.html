@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="assets/styles.css?v=27" />
+<link rel="stylesheet" href="assets/styles.css?v=28" />
 <link rel="icon" type="image/png" href="assets/img/favicon.png?v=3" />
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png?v=3" />
 <meta name="theme-color" content="#F2ECE2" />
@@ -228,45 +228,22 @@
     </div>
     <div class="review-grid">
       <blockquote class="review-card rv">
+        <div class="rhead"><span class="ravatar">B</span><div><b>Bruno</b><span>Brazil &middot; Airbnb</span></div></div>
         <div class="rstars">★★★★★</div>
         <p>"Everything was very clean and organized as described — it had everything. Ana was very attentive and helped us with what we needed."</p>
-        <cite>— Bruno, Brazil</cite>
       </blockquote>
       <blockquote class="review-card rv">
+        <div class="rhead"><span class="ravatar">G</span><div><b>Guest</b><span>Booking.com</span></div></div>
         <div class="rstars">★★★★★</div>
         <p>"Ms Ana was a wonderful host for this amazing oasis. It was so peaceful. We really enjoyed cooking in the outdoor kitchen and the shower with views of the stars."</p>
-        <cite>— Guest via Booking.com</cite>
       </blockquote>
-      <!-- Add more guest reviews here, copying a blockquote above. -->
+      <!-- More reviews: copy a blockquote. Avatar photo: put <img src="..." alt=""> inside .ravatar.
+           Guest photos: add <div class="rphotos"><img src="..." alt=""><img src="..." alt=""></div> before </blockquote>. -->
     </div>
 
-    <div id="leave-review" style="max-width:640px;margin:52px auto 0">
-      <div class="eyebrow rv">Stayed with us?</div>
-      <div class="lead rv" style="margin:14px auto 0"><h2>Leave a review</h2><p>Tell Ana about your stay — she reads every one personally.</p></div>
-      <form class="rv" data-inquiry="Guest Review" style="margin-top:30px;text-align:left" novalidate>
-        <div class="field"><label>Which villa did you stay in?</label>
-          <div class="extras">
-            <label class="chk"><input type="radio" name="villa" value="Naïma Luxury Cottage" checked /> Naïma Luxury</label>
-            <label class="chk"><input type="radio" name="villa" value="Maxwell Luxury Villa" /> Maxwell Luxury</label>
-          </div>
-        </div>
-        <div class="field"><label>Your rating</label>
-          <div class="extras">
-            <label class="chk"><input type="radio" name="rating" value="5 of 5 stars" checked /> ★★★★★</label>
-            <label class="chk"><input type="radio" name="rating" value="4 of 5 stars" /> ★★★★</label>
-            <label class="chk"><input type="radio" name="rating" value="3 of 5 stars" /> ★★★</label>
-            <label class="chk"><input type="radio" name="rating" value="2 of 5 stars" /> ★★</label>
-            <label class="chk"><input type="radio" name="rating" value="1 of 5 stars" /> ★</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="field"><label>Your name</label><input name="name" type="text" placeholder="Full name" required /></div>
-          <div class="field"><label>Your email</label><input name="email" type="email" placeholder="you@email.com" required /></div>
-        </div>
-        <div class="field"><label>Your review</label><textarea name="msg" rows="4" placeholder="How was your stay?" required></textarea></div>
-        <button class="btn btn--fill" type="submit">Send your review</button>
-        <p class="extras-note inq-note" hidden>Your email app is opening with your review — or <a class="inq-wa" href="#" target="_blank" rel="noreferrer" style="color:var(--teal);text-decoration:underline">send it by WhatsApp</a> instead.</p>
-      </form>
+    <div id="leave-review" style="margin-top:44px">
+      <a href="mailto:mendezestatesaruba@gmail.com?subject=Guest%20review" class="btn btn--fill" data-bkm-open>Leave a review</a>
+      <p class="extras-note">Stayed with us? Tell Ana about it — she reads every one personally.</p>
     </div>
   </div>
 </section>
@@ -290,7 +267,44 @@
   <div class="made">© <span id="yr"></span> Méndez Estates Aruba — Make Yourself at Home.</div>
 </footer>
 
+<div class="bkm" id="bkm" hidden>
+  <div class="bkm-back" data-bkm-close></div>
+  <div class="bkm-panel" role="dialog" aria-modal="true" aria-label="Leave a review">
+    <div class="bkm-head">
+      <div>
+        <div class="bkm-eyebrow">M&eacute;ndez Estates &middot; Guest reviews</div>
+        <h3>Leave a review</h3>
+      </div>
+      <button type="button" class="bkm-x" data-bkm-close aria-label="Close">&times;</button>
+    </div>
+    <form data-inquiry="Guest Review" novalidate>
+      <div class="field"><label>Which villa did you stay in?</label>
+        <div class="extras">
+          <label class="chk"><input type="radio" name="villa" value="Naïma Luxury Cottage" checked /> Naïma Luxury</label>
+          <label class="chk"><input type="radio" name="villa" value="Maxwell Luxury Villa" /> Maxwell Luxury</label>
+        </div>
+      </div>
+      <div class="field"><label>Your rating</label>
+        <div class="extras">
+          <label class="chk"><input type="radio" name="rating" value="5 of 5 stars" checked /> ★★★★★</label>
+          <label class="chk"><input type="radio" name="rating" value="4 of 5 stars" /> ★★★★</label>
+          <label class="chk"><input type="radio" name="rating" value="3 of 5 stars" /> ★★★</label>
+          <label class="chk"><input type="radio" name="rating" value="2 of 5 stars" /> ★★</label>
+          <label class="chk"><input type="radio" name="rating" value="1 of 5 stars" /> ★</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field"><label>Your name</label><input name="name" type="text" placeholder="Full name" required /></div>
+        <div class="field"><label>Your email</label><input name="email" type="email" placeholder="you@email.com" required /></div>
+      </div>
+      <div class="field"><label>Your review</label><textarea name="msg" rows="4" placeholder="How was your stay?" required></textarea></div>
+      <button class="btn btn--fill" type="submit">Send your review</button>
+      <p class="extras-note inq-note" hidden>Your email app is opening with your review — or <a class="inq-wa" href="#" target="_blank" rel="noreferrer" style="color:var(--teal);text-decoration:underline">send it by WhatsApp</a> instead.</p>
+    </form>
+  </div>
+</div>
+
 <div class="lb" id="lb"><span class="x">&times;</span><img id="lbImg" src="" alt="" /></div>
-<script src="assets/app.js?v=24"></script>
+<script src="assets/app.js?v=25"></script>
 </body>
 </html>

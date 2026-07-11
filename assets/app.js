@@ -552,6 +552,10 @@
       e.preventDefault();
       var y = el.getBoundingClientRect().top + window.pageYOffset - 66;
       window.scrollTo({ top: y, behavior: 'smooth' });
+      if (a.getAttribute('href') === '#leave-review'){
+        var t = document.querySelector('#leave-review [data-bkm-open]');
+        if (t) setTimeout(function(){ t.click(); }, 550);
+      }
     });
   })(links[i]);
 })();
