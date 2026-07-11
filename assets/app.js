@@ -556,12 +556,24 @@
   })(links[i]);
 })();
 
+// ---- car cards: prefill the quotation form with the chosen car ----
+(function(){
+  var links = document.querySelectorAll('a[data-car]');
+  for (var i = 0; i < links.length; i++) (function(a){
+    a.addEventListener('click', function(){
+      var inp = document.querySelector('#quote input[name="car"]');
+      if (inp) inp.value = a.getAttribute('data-car');
+    });
+  })(links[i]);
+})();
+
 // ---- service inquiry forms (Private Chef / Massage / Island Tours) ----
 // Independent from the property booking flow: composes an email straight to Ana.
 (function(){
   var LABELS = { name:'Name', email:'Email', phone:'Phone', date:'Preferred date',
                  occasion:'Occasion', msg:'Message', location:'Location',
-                 tour:'Desired tour', guests:'Number of guests', requests:'Special requests' };
+                 tour:'Desired tour', guests:'Number of guests', requests:'Special requests',
+                 villa:'Villa', rating:'Rating', car:'Preferred car', pickup:'Pick-up date', 'return':'Return date' };
   var forms = document.querySelectorAll('form[data-inquiry]');
   for (var i = 0; i < forms.length; i++) (function(fm){
     fm.addEventListener('submit', function(e){
