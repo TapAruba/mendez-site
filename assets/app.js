@@ -289,13 +289,26 @@
       if (v.indexOf('maxwell') > -1) return 'maxwell';
       return null;
     }
+    function isNaimaName(n){
+      return n.indexOf('naima') > -1 || n.indexOf('naïma') > -1 || n.indexOf('cottage') > -1 || n.indexOf('1-bed') > -1;
+    }
     function aptId(){
       var k = villaKey();
       if (!k || !apiApts) return null;
-      for (var i = 0; i < apiApts.length; i++){
-        var n = (apiApts[i].name || '').toLowerCase();
+      var i, n;
+      for (i = 0; i < apiApts.length; i++){
+        n = (apiApts[i].name || '').toLowerCase();
         if (k === 'maxwell' && n.indexOf('maxwell') > -1) return apiApts[i].id;
-        if (k === 'naima' && (n.indexOf('naima') > -1 || n.indexOf('naïma') > -1 || n.indexOf('cottage') > -1)) return apiApts[i].id;
+        if (k === 'naima' && isNaimaName(n)) return apiApts[i].id;
+      }
+      // Maxwell may be added to Smoobu under any property name — if the account
+      // has a second property that clearly isn't Naïma, treat it as Maxwell so
+      // direct booking activates without needing an exact name match.
+      if (k === 'maxwell' && apiApts.length > 1){
+        for (i = 0; i < apiApts.length; i++){
+          n = (apiApts[i].name || '').toLowerCase();
+          if (!isNaimaName(n) && apiApts[i].id !== NAIMA_ID) return apiApts[i].id;
+        }
       }
       return k === 'naima' ? NAIMA_ID : null;
     }
