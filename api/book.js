@@ -27,11 +27,13 @@ export default async function handler(req, res) {
   const money = function(n){ return '$' + Math.round(Number(n) || 0).toLocaleString('en-US'); };
   if (bd){
     noticeParts.push(
-      'Price breakdown shown to guest:\n' +
-      '  Accommodation: ' + money(bd.accommodation) + '\n' +
+      'Price breakdown shown to guest (' + (bd.seasonLabel || '') + '):\n' +
+      '  Nightly rate: ' + money(bd.nightlyRate) + '\n' +
+      '  Accommodation subtotal: ' + money(bd.accommodationSubtotal) + '\n' +
       '  Cleaning fee: ' + money(bd.cleaningFee) + '\n' +
       '  Government tax: ' + money(bd.governmentTax) + '\n' +
       '  Environmental tax: ' + money(bd.environmentalTax) + '\n' +
+      '  Additional guest fee: ' + money(bd.additionalGuestFee) + '\n' +
       '  Credit card fee: ' + money(bd.creditCardFee) + '\n' +
       '  TOTAL: ' + money(bd.total)
     );

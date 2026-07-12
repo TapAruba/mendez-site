@@ -212,8 +212,8 @@
     });
   }
 
-  // ---- Booking form: live Smoobu availability when the API is up, with a
-  // graceful fall back to the pre-filled email/WhatsApp enquiry when it isn't ----
+  // ---- Booking form: seasonal pricing always computed locally, real-time Smoobu
+  // availability layered on top where connected, direct reservation on submit ----
   var bookForm = document.getElementById('bookForm');
   if (bookForm){
     var fel = bookForm.elements;
@@ -256,27 +256,32 @@
       gp.addEventListener('click', function(){ bump(1); });
     }
 
-    // --- Smoobu direct booking: live availability, itemized pricing, real reservation ---
+    // --- Smoobu direct booking: seasonal pricing engine + real reservation ---
     var NAIMA_ID = 1218098; // known; other villas are auto-detected from /api/apartments
-    var apiApts = null;     // [{id,name}] once the key authenticates; null = not loaded yet
-    var apiOffline = false; // true once we've given up on /api/apartments entirely
+    var apiApts = null;     // [{id,name}] once the key authenticates; null = not resolved yet
     var lastQuote = null;   // {available,apartmentId,arrival,departure,nights,guests,breakdown}
     var bsum = document.getElementById('bsum');
+    var rateHint = document.getElementById('rateHint');
     var submitBtn = document.getElementById('bookSubmit');
+    var ackBox = document.getElementById('cancelAck');
+
+    var VILLA_RATES = {
+      naima:   { low: 89,  mid: 105, high: 150, label: 'Naïma Luxury Cottage' },
+      maxwell: { low: 295, mid: 365, high: 565, label: 'Maxwell Luxury Home' }
+    };
 
     function money(n){ return '$' + Math.round(Number(n) || 0).toLocaleString('en-US'); }
     function fmtDate(iso){ var d = new Date(iso + 'T00:00:00'); return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
     function setSubmitEnabled(on){ if (submitBtn) submitBtn.disabled = !on; }
+    function propertyName(k){ return (VILLA_RATES[k] && VILLA_RATES[k].label) || k; }
 
-    var calRefresh = null; // assigned by the calendar below; called once the API wakes up
+    var calRefresh = null, applyDates = null; // assigned by the calendar below
     fetch('/api/apartments').then(function(r){ return r.json(); }).then(function(j){
       if (j && j.ok && j.apartments && j.apartments.length){
-        apiApts = j.apartments; quoteCheck();
+        apiApts = j.apartments;
         if (calRefresh) calRefresh();
-      } else {
-        apiOffline = true; quoteCheck();
       }
-    }).catch(function(){ apiOffline = true; quoteCheck(); });
+    }).catch(function(){});
 
     function villaKey(){
       var v = (fel.villa && fel.villa.value || '').toLowerCase();
@@ -303,6 +308,16 @@
       return { arrival: a, departure: d.toISOString().slice(0, 10), nights: n };
     }
 
+    // always-visible season/rate reference — visible the instant a villa is picked,
+    // long before any dates are chosen
+    function renderRateHint(){
+      if (!rateHint) return;
+      var k = villaKey(), r = VILLA_RATES[k];
+      if (!r){ rateHint.hidden = true; return; }
+      rateHint.hidden = false;
+      rateHint.innerHTML = '<b>' + r.label + '</b> — Low ' + money(r.low) + '/night &middot; Mid ' + money(r.mid) + '/night &middot; High ' + money(r.high) + '/night';
+    }
+
     function renderHidden(){ if (bsum){ bsum.hidden = true; bsum.innerHTML = ''; } setSubmitEnabled(false); }
     function renderWait(){
       if (!bsum) return;
@@ -310,89 +325,90 @@
       bsum.innerHTML = '<div class="bsum-status">Checking availability…</div>';
       setSubmitEnabled(false);
     }
-    function renderBad(status, note){
+    function renderError(){
       if (!bsum) return;
       bsum.hidden = false; bsum.className = 'bsum bs-bad';
-      bsum.innerHTML = '<div class="bsum-status">' + status + '</div>' + (note ? '<div class="bsum-note">' + note + '</div>' : '');
+      bsum.innerHTML = '<div class="bsum-status">Couldn’t load pricing</div><div class="bsum-note">Please try again or pick different dates.</div>';
       setSubmitEnabled(false);
     }
-    function renderOffline(){
+    function renderSummary(j, stay, guests, k){
       if (!bsum) return;
-      bsum.hidden = false; bsum.className = 'bsum bs-bad';
-      bsum.innerHTML = '<div class="bsum-status">Not yet available online</div>' +
-        '<div class="bsum-offline">Direct online booking for this villa is being connected. Please call or WhatsApp Ana directly at <a href="tel:+2975922325">+297&nbsp;592&nbsp;2325</a> to reserve.</div>';
-      setSubmitEnabled(false);
-    }
-    function renderSystemOffline(){
-      if (!bsum) return;
-      bsum.hidden = false; bsum.className = 'bsum bs-bad';
-      bsum.innerHTML = '<div class="bsum-status">Booking system temporarily unavailable</div>' +
-        '<div class="bsum-offline">Please try again shortly, or call/WhatsApp Ana directly at <a href="tel:+2975922325">+297&nbsp;592&nbsp;2325</a>.</div>';
-      setSubmitEnabled(false);
-    }
-    function renderOk(j, stay, guests){
-      if (!bsum) return;
-      bsum.hidden = false; bsum.className = 'bsum bs-ok';
+      var warn = '', enable = true;
+      if (!j.meetsMinStay){
+        var sugg = new Date(stay.arrival + 'T00:00:00Z'); sugg.setUTCDate(sugg.getUTCDate() + j.minStay);
+        var suggIso = sugg.toISOString().slice(0, 10);
+        warn = '<div class="bsum-warn">Minimum stay for ' + propertyName(k) + ' during ' + j.seasonLabel + ' is ' + j.minStay + ' nights.' +
+          ' <button type="button" class="bsum-suggest" id="bsumSuggest" data-arrival="' + stay.arrival + '" data-nights="' + j.minStay + '">Use ' +
+          fmtDate(stay.arrival) + ' → ' + fmtDate(suggIso) + ' (' + j.minStay + ' nights)</button></div>';
+        enable = false;
+      } else if (j.available === false){
+        warn = '<div class="bsum-warn">Those dates are already booked for ' + propertyName(k) + '. Please choose different dates.</div>';
+        enable = false;
+      }
+      bsum.hidden = false;
+      bsum.className = 'bsum ' + (enable ? 'bs-ok' : 'bs-bad');
       bsum.innerHTML =
-        '<div class="bsum-status">Available — request to book</div>' +
+        '<div class="bsum-status">Current Season: <b>' + j.seasonLabel + ' (' + money(j.nightlyRate) + '/night)</b></div>' +
+        warn +
         '<div class="bsum-dates">' +
+          '<div>Property<b>' + propertyName(k) + '</b></div>' +
+          '<div>Season<b>' + j.seasonLabel + '</b></div>' +
           '<div>Check-in<b>' + fmtDate(stay.arrival) + '</b></div>' +
           '<div>Check-out<b>' + fmtDate(stay.departure) + '</b></div>' +
           '<div>Nights<b>' + j.nights + '</b></div>' +
           '<div>Guests<b>' + guests + '</b></div>' +
         '</div>' +
         '<ul class="bsum-rows">' +
-          '<li><span>Accommodation Rate</span><span>' + money(j.accommodation) + '</span></li>' +
+          '<li><span>Nightly Rate</span><span>' + money(j.nightlyRate) + '</span></li>' +
+          '<li><span>Accommodation Subtotal</span><span>' + money(j.accommodationSubtotal) + '</span></li>' +
           '<li><span>Cleaning Fee</span><span>' + money(j.cleaningFee) + '</span></li>' +
           '<li><span>Government Tax</span><span>' + money(j.governmentTax) + '</span></li>' +
           '<li><span>Environmental Tax</span><span>' + money(j.environmentalTax) + '</span></li>' +
+          '<li><span>Additional Guest Fee</span><span>' + money(j.additionalGuestFee) + '</span></li>' +
           '<li><span>Credit Card Fee</span><span>' + money(j.creditCardFee) + '</span></li>' +
         '</ul>' +
-        '<div class="bsum-total"><span>Total</span><span>' + money(j.total) + '</span></div>';
-      setSubmitEnabled(true);
+        '<div class="bsum-total"><span>Total Stay</span><span>' + money(j.total) + '</span></div>';
+
+      var suggBtn = document.getElementById('bsumSuggest');
+      if (suggBtn) suggBtn.addEventListener('click', function(){
+        if (applyDates) applyDates(suggBtn.getAttribute('data-arrival'), parseInt(suggBtn.getAttribute('data-nights'), 10));
+      });
+
+      lastQuote = enable ? {
+        available: true, apartmentId: aptId(), arrival: stay.arrival, departure: stay.departure,
+        nights: j.nights, guests: guests,
+        breakdown: {
+          seasonLabel: j.seasonLabel, nightlyRate: j.nightlyRate, accommodationSubtotal: j.accommodationSubtotal,
+          additionalGuestFee: j.additionalGuestFee, cleaningFee: j.cleaningFee, governmentTax: j.governmentTax,
+          environmentalTax: j.environmentalTax, creditCardFee: j.creditCardFee, total: j.total
+        }
+      } : null;
+      setSubmitEnabled(enable);
     }
 
     var qTimer = null, qSeq = 0;
     function quoteCheck(){
       lastQuote = null;
-      if (apiOffline){ renderSystemOffline(); return; }
-      if (!bsum || !apiApts) return;                 // still waiting on /api/apartments
-      var k = villaKey();
-      if (k && !aptId()){ renderOffline(); return; }  // this villa has no Smoobu apartment yet
-      var id = aptId(), stay = stayDates();
+      renderRateHint();
+      var k = villaKey(), stay = stayDates();
       var guests = parseInt(fel.guests && fel.guests.value, 10) || 2;
-      if (!id || !stay){ renderHidden(); return; }
+      if (!k || !stay){ renderHidden(); return; }
       var seq = ++qSeq;
       renderWait();
-      fetch('/api/availability?apartment=' + id + '&arrival=' + stay.arrival + '&departure=' + stay.departure +
-            '&villa=' + encodeURIComponent(k || 'naima') + '&guests=' + guests)
-        .then(function(r){ return r.json(); })
-        .then(function(j){
-          if (seq !== qSeq) return;                  // a newer check superseded this one
-          if (!j || !j.ok){ renderBad('Couldn’t load pricing', 'Please try again or pick different dates.'); return; }
-          if (j.available && j.meetsMinStay && j.priced){
-            lastQuote = {
-              available: true, apartmentId: id, arrival: stay.arrival, departure: stay.departure,
-              nights: j.nights, guests: guests,
-              breakdown: {
-                accommodation: j.accommodation, cleaningFee: j.cleaningFee, governmentTax: j.governmentTax,
-                environmentalTax: j.environmentalTax, creditCardFee: j.creditCardFee, total: j.total
-              }
-            };
-            renderOk(j, stay, guests);
-          } else if (j.available && !j.meetsMinStay){
-            renderBad('Minimum stay is ' + j.minStay + ' nights', 'Add a night or two and check again.');
-          } else if (j.available && !j.priced){
-            renderBad('Pricing unavailable for these dates', 'Try different dates, or call/WhatsApp Ana at +297 592 2325.');
-          } else {
-            renderBad('Those dates look taken', 'Try shifting your dates.');
-          }
-        }).catch(function(){ if (seq === qSeq) renderBad('Couldn’t load pricing', 'Please try again or pick different dates.'); });
+      var id = aptId();
+      var url = '/api/availability?villa=' + encodeURIComponent(k) + '&arrival=' + stay.arrival + '&departure=' + stay.departure + '&guests=' + guests;
+      if (id) url += '&apartment=' + id;
+      fetch(url).then(function(r){ return r.json(); }).then(function(j){
+        if (seq !== qSeq) return;                  // a newer check superseded this one
+        if (!j || !j.ok){ renderError(); return; }
+        renderSummary(j, stay, guests, k);
+      }).catch(function(){ if (seq === qSeq) renderError(); });
     }
     ['villa', 'arrival', 'nights', 'guests'].forEach(function(n){
       if (fel[n]) fel[n].addEventListener('change', function(){ clearTimeout(qTimer); qTimer = setTimeout(quoteCheck, 350); });
     });
     setSubmitEnabled(false);
+    renderRateHint();
 
     // --- date-range calendar (Airbnb-style; booked days shade in once Smoobu is live) ---
     (function(){
@@ -450,6 +466,11 @@
           }).catch(function(){});
       }
       calRefresh = fetchMonths;
+      applyDates = function(arrivalIso, nights){
+        selA = fromIso(arrivalIso);
+        selB = new Date(selA); selB.setDate(selB.getDate() + nights);
+        sync(); build();
+      };
 
       function nightsFree(a, b){
         var d = new Date(a);
@@ -549,7 +570,7 @@
       if (!bsum) return;
       bsum.hidden = false; bsum.className = 'bsum bs-bad bsum-error';
       bsum.innerHTML = '<div class="bsum-status">We couldn’t complete your reservation</div>' +
-        '<div class="bsum-note">Please try again — if this keeps happening, call or WhatsApp Ana directly at <a href="tel:+2975922325">+297&nbsp;592&nbsp;2325</a>.</div>' +
+        '<div class="bsum-note">Please try again in a moment.</div>' +
         '<button type="button" class="btn btn--fill" id="bsumRetry">Try again</button>';
       bsum.scrollIntoView({ behavior: 'smooth', block: 'center' });
       var retry = document.getElementById('bsumRetry');
@@ -566,9 +587,17 @@
         if (db){ db.classList.add('attn'); setTimeout(function(){ db.classList.remove('attn'); }, 2200); db.scrollIntoView({ behavior:'smooth', block:'center' }); }
         return;
       }
-      // a confirmed, priced, available live quote is required — the submit button
+      // the cancellation-policy acknowledgment is mandatory
+      if (ackBox && !ackBox.checked){
+        var ackWrap = ackBox.closest('.cancel-box') || ackBox;
+        ackWrap.classList.add('chk-hi');
+        setTimeout(function(){ ackWrap.classList.remove('chk-hi'); }, 2200);
+        ackWrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+      // a confirmed, priced, available quote is required — the submit button
       // is disabled otherwise, but re-check here in case of a stale click
-      if (!lastQuote || !lastQuote.available || !lastQuote.apartmentId || !lastQuote.breakdown){
+      if (!lastQuote || !lastQuote.available || !lastQuote.breakdown){
         quoteCheck();
         return;
       }

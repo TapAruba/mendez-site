@@ -419,9 +419,13 @@ section{padding:120px 0}
 .cancel-box li{position:relative;padding-left:18px;font-size:13px;color:var(--ink-soft);margin-bottom:7px;line-height:1.5}
 .cancel-box li::before{content:"";position:absolute;left:0;top:7px;width:5px;height:5px;border-radius:50%;background:var(--gold)}
 .cancel-box li:last-child{margin-bottom:0}
-.consent-note{font-size:12px;color:var(--stone);text-align:center;margin-top:14px;line-height:1.5}
-.consent-note a{color:var(--teal);text-decoration:underline;text-underline-offset:2px}
-.consent-note a:hover{color:var(--acc)}
+.cancel-ack{display:flex!important;align-items:flex-start;gap:10px;margin-top:14px!important;padding-top:14px;border-top:1px solid var(--line);cursor:pointer;text-transform:none;letter-spacing:normal;font-size:inherit;color:inherit}
+.cancel-ack input{width:17px;height:17px;flex:none;margin:2px 0 0;accent-color:var(--acc);cursor:pointer}
+.cancel-ack span{font-size:13px;color:var(--ink);line-height:1.5}
+
+/* ---- Always-visible season/rate reference near the date picker ---- */
+.rate-hint{font-size:12.5px;color:var(--ink-soft);margin:8px 0 4px;line-height:1.5}
+.rate-hint b{color:var(--ink);font-family:var(--sans2);font-weight:500}
 
 /* booking / contact */
 .book{background:linear-gradient(180deg,#FDFBF6 0%,#F5EEE0 100%);color:var(--ink)}
@@ -548,10 +552,14 @@ footer .fl a:hover{color:var(--teal)}
 /* ---- Booking Summary — itemized live quote from Smoobu ---- */
 .bsum{border:1px solid var(--line);border-radius:16px;background:#fff;padding:20px 22px;margin:2px 0 18px;box-shadow:0 4px 16px rgba(27,37,40,.05)}
 .bsum-status{font-family:var(--sans2);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:2px}
+.bsum-status b{font-family:var(--serif);font-size:15px;letter-spacing:0;text-transform:none;color:var(--ink);font-weight:500;margin-left:4px}
 .bsum-note{font-size:12.5px;color:var(--ink-soft);margin-top:2px}
 .bsum.bs-bad{border-color:rgba(201,123,93,.4)}
 .bsum.bs-bad .bsum-status{color:#B25F41}
 .bsum.bs-wait .bsum-status{color:var(--ink-soft)}
+.bsum-warn{background:rgba(201,123,93,.1);border:1px solid rgba(201,123,93,.3);border-radius:12px;padding:12px 14px;margin-top:12px;font-size:13.5px;color:#8a4b34;line-height:1.55}
+.bsum-suggest{display:block;margin-top:10px;background:#fff;border:1px solid #C97B5D;color:#B25F41;font-family:var(--sans2);font-size:12px;letter-spacing:.03em;border-radius:99px;padding:8px 16px;cursor:pointer;transition:.25s}
+.bsum-suggest:hover{background:#C97B5D;color:#fff}
 .bsum-dates{display:flex;flex-wrap:wrap;gap:8px 22px;margin:12px 0 16px;padding-bottom:14px;border-bottom:1px solid var(--line)}
 .bsum-dates div{font-size:13px;color:var(--ink-soft)}
 .bsum-dates b{display:block;font-family:var(--serif);font-size:16px;color:var(--ink);font-weight:500}
@@ -561,9 +569,6 @@ footer .fl a:hover{color:var(--teal)}
 .bsum-total{display:flex;justify-content:space-between;align-items:baseline;margin-top:10px;padding-top:14px;border-top:1px solid var(--line)}
 .bsum-total span:first-child{font-family:var(--sans2);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink)}
 .bsum-total span:last-child{font-family:var(--serif);font-size:26px;color:var(--teal)}
-.bsum-offline{font-size:13.5px;color:var(--ink-soft);line-height:1.6}
-.bsum-offline a{color:var(--teal);text-decoration:underline;text-underline-offset:2px}
-.bsum-offline a:hover{color:var(--acc)}
 .bsum-error{border-left:4px solid #C97B5D;padding-left:14px;margin-top:2px}
 .bsum-error .btn{margin-top:10px;padding:11px 22px;font-size:12px}
 
