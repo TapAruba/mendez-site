@@ -23,8 +23,22 @@ export default async function handler(req, res) {
   const noticeParts = [];
   if (b.extras && b.extras.length) noticeParts.push('Extras requested: ' + [].concat(b.extras).join(', ').slice(0, 300));
   if (b.message) noticeParts.push(String(b.message).slice(0, 800));
-  const est = Number(b.estimate);
-  if (est > 0 && est < 1000000) noticeParts.push('Site estimate shown to guest: $' + est + ' (rates + cleaning + taxes, before any long-stay discount).');
+  const bd = b.breakdown && typeof b.breakdown === 'object' ? b.breakdown : null;
+  const money = function(n){ return '$' + Math.round(Number(n) || 0).toLocaleString('en-US'); };
+  if (bd){
+    noticeParts.push(
+      'Price breakdown shown to guest:\n' +
+      '  Accommodation: ' + money(bd.accommodation) + '\n' +
+      '  Cleaning fee: ' + money(bd.cleaningFee) + '\n' +
+      '  Government tax: ' + money(bd.governmentTax) + '\n' +
+      '  Environmental tax: ' + money(bd.environmentalTax) + '\n' +
+      '  Credit card fee: ' + money(bd.creditCardFee) + '\n' +
+      '  TOTAL: ' + money(bd.total)
+    );
+  } else {
+    const est = Number(b.estimate);
+    if (est > 0 && est < 1000000) noticeParts.push('Site estimate shown to guest: $' + est + '.');
+  }
   noticeParts.push('Sent from mendez-site direct booking form.');
 
   try {

@@ -16,6 +16,7 @@ img{max-width:100%;display:block}
 .wrap{max-width:1240px;margin:0 auto;padding:0 28px}
 .eyebrow{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--acc);font-weight:600}
 .btn{display:inline-flex;align-items:center;gap:9px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;padding:15px 30px;border-radius:99px;border:1px solid var(--ink);color:var(--ink);background:transparent;cursor:pointer;transition:.4s var(--ease)}
+.btn:disabled{opacity:.4;cursor:not-allowed;pointer-events:none;transform:none!important}
 .btn:hover{background:var(--ink);color:var(--sand)}
 .btn--fill{background:var(--teal);border-color:var(--teal);color:#fff}
 .btn--fill:hover{background:var(--ocean);border-color:var(--ocean);color:#fff;transform:translateY(-2px)}
@@ -543,6 +544,28 @@ footer .fl a:hover{color:var(--teal)}
 .quote.q-bad{border-left-color:#C97B5D}
 .quote.q-bad .q-status{color:#B25F41}
 .quote.q-wait .q-status{color:var(--ink-soft)}
+
+/* ---- Booking Summary — itemized live quote from Smoobu ---- */
+.bsum{border:1px solid var(--line);border-radius:16px;background:#fff;padding:20px 22px;margin:2px 0 18px;box-shadow:0 4px 16px rgba(27,37,40,.05)}
+.bsum-status{font-family:var(--sans2);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:2px}
+.bsum-note{font-size:12.5px;color:var(--ink-soft);margin-top:2px}
+.bsum.bs-bad{border-color:rgba(201,123,93,.4)}
+.bsum.bs-bad .bsum-status{color:#B25F41}
+.bsum.bs-wait .bsum-status{color:var(--ink-soft)}
+.bsum-dates{display:flex;flex-wrap:wrap;gap:8px 22px;margin:12px 0 16px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.bsum-dates div{font-size:13px;color:var(--ink-soft)}
+.bsum-dates b{display:block;font-family:var(--serif);font-size:16px;color:var(--ink);font-weight:500}
+.bsum-rows{list-style:none}
+.bsum-rows li{display:flex;justify-content:space-between;gap:14px;font-size:14px;color:var(--ink-soft);padding:7px 0}
+.bsum-rows li span:last-child{color:var(--ink);font-family:var(--sans2)}
+.bsum-total{display:flex;justify-content:space-between;align-items:baseline;margin-top:10px;padding-top:14px;border-top:1px solid var(--line)}
+.bsum-total span:first-child{font-family:var(--sans2);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink)}
+.bsum-total span:last-child{font-family:var(--serif);font-size:26px;color:var(--teal)}
+.bsum-offline{font-size:13.5px;color:var(--ink-soft);line-height:1.6}
+.bsum-offline a{color:var(--teal);text-decoration:underline;text-underline-offset:2px}
+.bsum-offline a:hover{color:var(--acc)}
+.bsum-error{border-left:4px solid #C97B5D;padding-left:14px;margin-top:2px}
+.bsum-error .btn{margin-top:10px;padding:11px 22px;font-size:12px}
 
 /* ---- modern booking controls: villa pills, guest stepper, date-range calendar ---- */
 .seg{display:flex;background:#F4EFE5;border:1px solid var(--line);border-radius:99px;padding:4px;gap:4px}
