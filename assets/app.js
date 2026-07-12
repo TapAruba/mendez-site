@@ -344,6 +344,8 @@
       } else if (j.available === false){
         warn = '<div class="bsum-warn">Those dates are already booked for ' + propertyName(k) + '. Please choose different dates.</div>';
         enable = false;
+      } else if (j.available === null){
+        warn = '<div class="bsum-note">Availability for ' + propertyName(k) + ' is confirmed personally by Ana once you send your request.</div>';
       }
       bsum.hidden = false;
       bsum.className = 'bsum ' + (enable ? 'bs-ok' : 'bs-bad');
@@ -538,7 +540,43 @@
       if (sent){ sent.hidden = false; sent.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
     }
 
+    // Villas without a Smoobu apartment (currently Maxwell) can't be booked through
+    // /api/book — hand the fully-priced request to Ana by email/WhatsApp instead.
+    function composeEnquiry(){
+      var el = bookForm.elements;
+      var g = function(n){ var v = el[n] ? String(el[n].value).trim() : ''; return v || '—'; };
+      var extras = [].slice.call(bookForm.querySelectorAll('input[name="extra"]:checked')).map(function(c){ return c.value; });
+      var bd = lastQuote.breakdown;
+      var subject = 'Booking enquiry — ' + g('villa');
+      var lines = [
+        'Hello Ana,', '',
+        'I would like to book the following stay:', '',
+        'Villa: ' + g('villa'),
+        'Check-in: ' + lastQuote.arrival,
+        'Check-out: ' + lastQuote.departure,
+        'Nights: ' + lastQuote.nights,
+        'Guests: ' + lastQuote.guests,
+        'Name: ' + g('name'),
+        'Email: ' + g('email'),
+        'Phone: ' + g('phone'),
+        'Country: ' + g('country')
+      ];
+      if (extras.length) lines.push('Extras: ' + extras.join(', '));
+      if (el.msg && el.msg.value.trim()) lines.push('Message: ' + el.msg.value.trim());
+      lines.push('', 'Site estimate (' + bd.seasonLabel + '): ' + money(bd.total) + ' total incl. cleaning, taxes & card fee.', '', 'Thank you!');
+      var body = lines.join('\n');
+      var mail = document.getElementById('bsMail'), wa = document.getElementById('bsWa'), acts = document.getElementById('bsActions');
+      if (mail) mail.href = 'mailto:mendezestatesaruba@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+      if (wa) wa.href = 'https://wa.me/2975922325?text=' + encodeURIComponent(body);
+      if (acts) acts.hidden = false;
+      var title = document.getElementById('bsTitle'), text = document.getElementById('bsText');
+      if (title) title.textContent = 'Your enquiry is ready';
+      if (text) text.textContent = 'Send it straight to Ana — she replies personally to confirm availability and payment. Nothing is charged until then.';
+      showSent();
+    }
+
     function submitReservation(){
+      if (!lastQuote.apartmentId){ composeEnquiry(); return; }
       var el = bookForm.elements;
       var g = function(n){ var v = el[n] ? String(el[n].value).trim() : ''; return v || '—'; };
       var extras = [].slice.call(bookForm.querySelectorAll('input[name="extra"]:checked')).map(function(c){ return c.value; });
