@@ -292,23 +292,16 @@
     function isNaimaName(n){
       return n.indexOf('naima') > -1 || n.indexOf('naïma') > -1 || n.indexOf('cottage') > -1 || n.indexOf('1-bed') > -1;
     }
+    // Villas Ana handles by email instead of Smoobu direct-booking. Maxwell is
+    // email-only by her decision (2026-07-13) — do NOT auto-activate it from
+    // /api/apartments even if it later appears in the Smoobu account.
+    var EMAIL_ONLY = { maxwell: true };
+
     function aptId(){
       var k = villaKey();
-      if (!k || !apiApts) return null;
-      var i, n;
-      for (i = 0; i < apiApts.length; i++){
-        n = (apiApts[i].name || '').toLowerCase();
-        if (k === 'maxwell' && n.indexOf('maxwell') > -1) return apiApts[i].id;
-        if (k === 'naima' && isNaimaName(n)) return apiApts[i].id;
-      }
-      // Maxwell may be added to Smoobu under any property name — if the account
-      // has a second property that clearly isn't Naïma, treat it as Maxwell so
-      // direct booking activates without needing an exact name match.
-      if (k === 'maxwell' && apiApts.length > 1){
-        for (i = 0; i < apiApts.length; i++){
-          n = (apiApts[i].name || '').toLowerCase();
-          if (!isNaimaName(n) && apiApts[i].id !== NAIMA_ID) return apiApts[i].id;
-        }
+      if (!k || EMAIL_ONLY[k] || !apiApts) return null;
+      for (var i = 0; i < apiApts.length; i++){
+        if (isNaimaName((apiApts[i].name || '').toLowerCase())) return apiApts[i].id;
       }
       return k === 'naima' ? NAIMA_ID : null;
     }
@@ -588,8 +581,47 @@
       showSent();
     }
 
+    // Email-only villas (Maxwell): send the fully-priced request to Ana server-side
+    // via /api/enquiry, so the guest submits once and never has to open a mail app.
+    // If that call fails for any reason we fall back to the mailto/WhatsApp panel.
+    function sendEnquiry(){
+      var el = bookForm.elements;
+      var g = function(n){ var v = el[n] ? String(el[n].value).trim() : ''; return v; };
+      if (submitBtn){ submitBtn.disabled = true; submitBtn.textContent = 'Sending…'; }
+      fetch('/api/enquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          villa: g('villa'),
+          arrival: lastQuote.arrival,
+          departure: lastQuote.departure,
+          nights: lastQuote.nights,
+          guests: lastQuote.guests,
+          name: g('name'), email: g('email'),
+          phone: g('phone'), country: g('country'),
+          message: g('msg'),
+          breakdown: lastQuote.breakdown
+        })
+      }).then(function(r){ return r.json(); }).then(function(j){
+        if (submitBtn){ submitBtn.disabled = false; submitBtn.textContent = 'Reserve Now'; }
+        if (j && j.ok){
+          var title = document.getElementById('bsTitle'), text = document.getElementById('bsText');
+          if (title) title.textContent = 'Request sent';
+          if (text) text.textContent = 'Ana has your request and replies personally to confirm availability and send a secure payment link. Nothing is charged until then.';
+          var acts = document.getElementById('bsActions');
+          if (acts) acts.hidden = true;
+          showSent();
+          return;
+        }
+        composeEnquiry();
+      }).catch(function(){
+        if (submitBtn){ submitBtn.disabled = false; submitBtn.textContent = 'Reserve Now'; }
+        composeEnquiry();
+      });
+    }
+
     function submitReservation(){
-      if (!lastQuote.apartmentId){ composeEnquiry(); return; }
+      if (!lastQuote.apartmentId){ sendEnquiry(); return; }
       var el = bookForm.elements;
       var g = function(n){ var v = el[n] ? String(el[n].value).trim() : ''; return v || '—'; };
       var extras = [].slice.call(bookForm.querySelectorAll('input[name="extra"]:checked')).map(function(c){ return c.value; });
