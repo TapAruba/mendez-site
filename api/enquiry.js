@@ -6,7 +6,8 @@
 // Requires env var RESEND_API_KEY. Sends from taparuba.com (verified in Resend);
 // if mendezestatesaruba.com is ever verified there, change FROM to it.
 
-const TO = 'mendezestatesaruba@gmail.com';
+// ENQUIRY_TO lets us route test sends away from Ana's inbox; unset in production.
+const TO = process.env.ENQUIRY_TO || 'mendezestatesaruba@gmail.com';
 const FROM = 'Méndez Estates <bookings@taparuba.com>';
 
 const CREAM = '#F2ECE2', LAGOON = '#0F2E36', TEAL = '#2C6E77', ACC = '#4FAAB2', MUTED = '#6B7C7F';
