@@ -411,6 +411,8 @@ section{padding:120px 0}
 }
 
 /* ---- Cancellation policy — inline booking notice ---- */
+.fineprint{font-size:12px;line-height:1.55;color:var(--ink-soft);opacity:.85;margin:0 0 22px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.fineprint a{color:var(--teal);text-decoration:underline;text-underline-offset:2px}
 .cancel-box{background:#fff;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:14px;padding:18px 20px;margin:4px 0 20px}
 .cancel-box-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .cancel-box-head svg{color:var(--teal);flex:none}
