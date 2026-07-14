@@ -744,32 +744,24 @@
 })();
 
 
-// ---- services page: compact inquiry section with a service switcher ----
+// ---- services page: one inquiry form; the service cards / nav links prefill it ----
 (function(){
-  var seg = document.getElementById('svcSeg');
-  if (!seg) return;
-  var btns = seg.querySelectorAll('button');
-  function show(key){
-    for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('on', btns[i].getAttribute('data-svc') === key);
-    var forms = document.querySelectorAll('form[data-svc-form]');
-    for (var j = 0; j < forms.length; j++) forms[j].hidden = forms[j].getAttribute('data-svc-form') !== key;
-  }
-  for (var i = 0; i < btns.length; i++) (function(b){
-    b.addEventListener('click', function(){ show(b.getAttribute('data-svc')); });
-  })(btns[i]);
+  var inp = document.querySelector('#inquire input[name="service"]');
+  if (!inp) return;
+  var NAMES = { chef: 'Private chef', massage: 'Massage', tours: 'Island tour' };
   function fromHash(){
-    var h = (location.hash || '').replace('#','');
-    if (h === 'chef' || h === 'massage' || h === 'tours') show(h);
+    var name = NAMES[(location.hash || '').replace('#','')];
+    if (name) inp.value = name;
   }
   fromHash();
   window.addEventListener('hashchange', fromHash);
 })();
 
-// ---- service inquiry forms (Private Chef / Massage / Island Tours) ----
+// ---- service inquiry forms (services, car quotation, guest review) ----
 // Independent from the property booking flow: composes an email straight to Ana.
 (function(){
   var LABELS = { name:'Name', email:'Email', phone:'Phone', date:'Preferred date',
-                 occasion:'Occasion', msg:'Message', location:'Location',
+                 service:'Service', occasion:'Occasion', msg:'Message', location:'Location',
                  tour:'Desired tour', guests:'Number of guests', requests:'Special requests',
                  villa:'Villa', rating:'Rating', car:'Preferred car', pickup:'Pick-up date', 'return':'Return date' };
   var forms = document.querySelectorAll('form[data-inquiry]');

@@ -97,65 +97,25 @@
     <span id="chef"></span><span id="massage"></span><span id="tours"></span>
     <div style="text-align:center;max-width:640px;margin:0 auto">
       <div class="eyebrow rv">Plan it with Ana</div>
-      <div class="lead rv" style="margin:14px auto 0"><h2>Send an inquiry</h2><p>Pick a service and tell Ana what you have in mind — she replies personally to arrange everything.</p></div>
-      <div class="seg rv" id="svcSeg" role="group" aria-label="Choose a service" style="max-width:460px;margin:28px auto 0">
-        <button type="button" class="on" data-svc="chef">Private Chef</button>
-        <button type="button" data-svc="massage">Massage</button>
-        <button type="button" data-svc="tours">Island Tours</button>
+      <div class="lead rv" style="margin:14px auto 0"><h2>Send an inquiry</h2><p>Tell Ana which service you'd like and what you have in mind — she replies personally to arrange everything.</p></div>
+    </div>
+    <form class="rv" data-inquiry="Service" style="max-width:640px;margin:36px auto 0" novalidate>
+      <div class="row">
+        <div class="field"><label>Your name</label><input name="name" type="text" placeholder="Full name" required /></div>
+        <div class="field"><label>Your email</label><input name="email" type="email" placeholder="you@email.com" required /></div>
       </div>
-    </div>
-    <div class="rv" style="max-width:640px;margin:30px auto 0">
-      <form data-inquiry="Private Chef" data-svc-form="chef" novalidate>
-        <div class="row">
-          <div class="field"><label>Your name</label><input name="name" type="text" placeholder="Full name" required /></div>
-          <div class="field"><label>Your email</label><input name="email" type="email" placeholder="you@email.com" required /></div>
-        </div>
-        <div class="row">
-          <div class="field"><label>Your phone</label><input name="phone" type="tel" placeholder="+1 555 010 2030" required /></div>
-          <div class="field"><label>Preferred date</label><input name="date" type="date" /></div>
-        </div>
-        <div class="field"><label>Occasion</label><input name="occasion" type="text" placeholder="Birthday, anniversary, honeymoon…" /></div>
-        <div class="field"><label>Message</label><textarea name="msg" rows="3" placeholder="Number of guests, preferences, anything Ana should know…"></textarea></div>
-        <button class="btn btn--fill" type="submit">Send inquiry to Ana</button>
-        <p class="extras-note inq-note" hidden>Your email app is opening with your inquiry — or <a class="inq-wa" href="#" target="_blank" rel="noreferrer" style="color:var(--teal);text-decoration:underline">send it by WhatsApp</a> instead.</p>
-      </form>
-      <form data-inquiry="Massage" data-svc-form="massage" hidden novalidate>
-        <div class="field"><label>Where would you like it?</label>
-          <div class="extras">
-            <label class="chk"><input type="radio" name="location" value="Massage at the property" checked /> At the property</label>
-            <label class="chk"><input type="radio" name="location" value="Massage at the spa" /> At the spa</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="field"><label>Your name</label><input name="name" type="text" placeholder="Full name" required /></div>
-          <div class="field"><label>Your email</label><input name="email" type="email" placeholder="you@email.com" required /></div>
-        </div>
-        <div class="row">
-          <div class="field"><label>Your phone</label><input name="phone" type="tel" placeholder="+1 555 010 2030" required /></div>
-          <div class="field"><label>Preferred date</label><input name="date" type="date" /></div>
-        </div>
-        <div class="field"><label>Message</label><textarea name="msg" rows="3" placeholder="How many guests, preferred time, anything else…"></textarea></div>
-        <button class="btn btn--fill" type="submit">Send inquiry to Ana</button>
-        <p class="extras-note inq-note" hidden>Your email app is opening with your inquiry — or <a class="inq-wa" href="#" target="_blank" rel="noreferrer" style="color:var(--teal);text-decoration:underline">send it by WhatsApp</a> instead.</p>
-      </form>
-      <form data-inquiry="Island Tours" data-svc-form="tours" hidden novalidate>
-        <div class="row">
-          <div class="field"><label>Your name</label><input name="name" type="text" placeholder="Full name" required /></div>
-          <div class="field"><label>Your email</label><input name="email" type="email" placeholder="you@email.com" required /></div>
-        </div>
-        <div class="row">
-          <div class="field"><label>Desired tour</label><input name="tour" type="text" placeholder="Beaches, national park, sunset, culture…" /></div>
-          <div class="field"><label>Number of guests</label><input name="guests" type="number" min="1" max="16" placeholder="2" /></div>
-        </div>
-        <div class="row">
-          <div class="field"><label>Preferred date</label><input name="date" type="date" /></div>
-          <div class="field"><label>Your phone</label><input name="phone" type="tel" placeholder="+1 555 010 2030" /></div>
-        </div>
-        <div class="field"><label>Special requests</label><textarea name="requests" rows="3" placeholder="Accessibility, kids, photo stops, food along the way…"></textarea></div>
-        <button class="btn btn--fill" type="submit">Send inquiry to Ana</button>
-        <p class="extras-note inq-note" hidden>Your email app is opening with your inquiry — or <a class="inq-wa" href="#" target="_blank" rel="noreferrer" style="color:var(--teal);text-decoration:underline">send it by WhatsApp</a> instead.</p>
-      </form>
-    </div>
+      <div class="row">
+        <div class="field"><label>Your phone</label><input name="phone" type="tel" placeholder="+1 555 010 2030" required /></div>
+        <div class="field"><label>Which service</label><input name="service" type="text" placeholder="Private chef, massage, island tour…" /></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>Preferred date</label><input name="date" type="date" /></div>
+        <div class="field"><label>Number of guests</label><input name="guests" type="number" min="1" max="16" placeholder="2" /></div>
+      </div>
+      <div class="field"><label>Message</label><textarea name="msg" rows="3" placeholder="Occasion, preferences, anything Ana should know…"></textarea></div>
+      <button class="btn btn--fill" type="submit">Send inquiry to Ana</button>
+      <p class="extras-note inq-note" hidden>Your email app is opening with your inquiry — or <a class="inq-wa" href="#" target="_blank" rel="noreferrer" style="color:var(--teal);text-decoration:underline">send it by WhatsApp</a> instead.</p>
+    </form>
   </div>
 </section>
 
@@ -211,6 +171,6 @@
 </footer>
 
 <div class="lb" id="lb"><span class="x">&times;</span><img id="lbImg" src="" alt="" /></div>
-<script src="assets/app.js?v=31"></script>
+<script src="assets/app.js?v=32"></script>
 </body>
 </html>
