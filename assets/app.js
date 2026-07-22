@@ -142,9 +142,18 @@
       cur = (i + slides.length) % slides.length;
       slides.forEach(function(s,n){ s.classList.toggle('on', n === cur); });
       dots.forEach(function(d,n){ d.classList.toggle('on', n === cur); });
-      if (vid){ if (slides[cur] === vid){ vid.currentTime = 0; vid.play().catch(function(){}); } else vid.pause(); }
-      clearTimeout(timer); timer = setTimeout(function(){ go(cur + 1); }, 6500);
+      clearTimeout(timer);
+      if (vid && slides[cur] === vid){
+        // video slide plays its full length; 'ended' advances, long timer is a safety net
+        vid.currentTime = 0;
+        timer = setTimeout(function(){ go(cur + 1); }, 60000);
+        vid.play().catch(function(){ clearTimeout(timer); timer = setTimeout(function(){ go(cur + 1); }, 6500); });
+      } else {
+        if (vid) vid.pause();
+        timer = setTimeout(function(){ go(cur + 1); }, 6500);
+      }
     };
+    if (vid) vid.addEventListener('ended', function(){ if (slides[cur] === vid) go(cur + 1); });
     dots.forEach(function(d){ d.addEventListener('click', function(){ go(+d.dataset.s); }); });
     if (slides.length > 1) go(0);
 
