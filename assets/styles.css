@@ -505,10 +505,32 @@ footer .fl a:hover{color:var(--teal)}
 .rv.in{opacity:1;transform:none}
 
 /* mobile nav panel */
-.mnav{position:fixed;inset:0;background:var(--deep);z-index:110;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;transform:translateY(-100%);transition:.5s var(--ease)}
+.mnav{position:fixed;inset:0;background:linear-gradient(180deg,#FBF8F1,#F2ECE2);z-index:110;display:flex;flex-direction:column;align-items:flex-start;padding:26px 34px 34px;transform:translateX(102%);transition:.55s var(--ease);overflow-y:auto;overscroll-behavior:contain}
 .mnav.open{transform:none}
-.mnav a{color:#fff;font-family:var(--serif);font-size:30px}
-.mnav .x{position:absolute;top:26px;right:30px;color:#fff;font-size:34px;cursor:pointer}
+.mnav .x{position:absolute;top:18px;right:26px;color:var(--ink);font-size:34px;cursor:pointer;line-height:1;padding:6px}
+.mnav-logo{height:46px;width:auto;margin-bottom:6px}
+.mnav-links{display:flex;flex-direction:column;align-items:flex-start;gap:13px;margin-top:16px}
+.mnav-eyebrow{font-family:var(--sans2);font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;font-weight:600;color:var(--acc);margin-top:20px}
+.mnav-links a{color:var(--ink);font-family:var(--serif);font-size:27px;line-height:1.12}
+.mnav-links a:active{color:var(--teal)}
+.mnav-links{margin-bottom:30px}
+.mnav-cta{display:inline-flex;align-items:center;gap:9px;margin-top:auto;padding:16px 34px;background:var(--teal);color:#fff;font-family:var(--sans2);font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;border-radius:99px;box-shadow:0 14px 30px rgba(44,110,119,.26)}
+.mnav-contact{display:flex;align-items:center;gap:10px;margin-top:16px;font-family:var(--sans2);font-size:13px;color:var(--ink-soft)}
+.mnav-contact a{color:var(--ink-soft);text-decoration:underline;text-underline-offset:3px}
+.mnav .x,.mnav-logo,.mnav-links a,.mnav-eyebrow,.mnav-cta,.mnav-contact{opacity:0;transform:translateY(14px);transition:opacity .45s var(--ease),transform .45s var(--ease)}
+.mnav.open .x,.mnav.open .mnav-logo,.mnav.open .mnav-links a,.mnav.open .mnav-eyebrow,.mnav.open .mnav-cta,.mnav.open .mnav-contact{opacity:1;transform:none}
+.mnav.open .mnav-links>*:nth-child(1){transition-delay:.08s}
+.mnav.open .mnav-links>*:nth-child(2){transition-delay:.11s}
+.mnav.open .mnav-links>*:nth-child(3){transition-delay:.14s}
+.mnav.open .mnav-links>*:nth-child(4){transition-delay:.17s}
+.mnav.open .mnav-links>*:nth-child(5){transition-delay:.2s}
+.mnav.open .mnav-links>*:nth-child(6){transition-delay:.23s}
+.mnav.open .mnav-links>*:nth-child(7){transition-delay:.26s}
+.mnav.open .mnav-links>*:nth-child(8){transition-delay:.29s}
+.mnav.open .mnav-links>*:nth-child(9){transition-delay:.32s}
+.mnav.open .mnav-links>*:nth-child(10){transition-delay:.35s}
+.mnav.open .mnav-cta{transition-delay:.4s}
+.mnav.open .mnav-contact{transition-delay:.46s}
 
 @media(max-width:1000px){
   .nav-links,.nav-cta{display:none}
