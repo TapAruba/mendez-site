@@ -171,9 +171,15 @@
   // ---- Mobile nav ----
   var mnav = document.getElementById('mnav'), menuBtn = document.getElementById('menuBtn'), mnavX = document.getElementById('mnavX');
   if (mnav && menuBtn){
-    menuBtn.onclick = function(){ mnav.classList.add('open'); };
-    if (mnavX) mnavX.onclick = function(){ mnav.classList.remove('open'); };
-    mnav.querySelectorAll('a').forEach(function(a){ a.onclick = function(){ mnav.classList.remove('open'); }; });
+    var mnavBk = document.createElement('div');
+    mnavBk.className = 'mnav-backdrop';
+    document.body.appendChild(mnavBk);
+    var mnavOpen = function(){ mnav.classList.add('open'); mnavBk.classList.add('on'); };
+    var mnavClose = function(){ mnav.classList.remove('open'); mnavBk.classList.remove('on'); };
+    menuBtn.onclick = mnavOpen;
+    if (mnavX) mnavX.onclick = mnavClose;
+    mnavBk.onclick = mnavClose;
+    mnav.querySelectorAll('a').forEach(function(a){ a.onclick = mnavClose; });
   }
 
   // ---- Language: English only. Google Translate widget REMOVED entirely so its mobile
