@@ -86,11 +86,11 @@ html{margin-top:0!important}
 .hero h1{font-size:clamp(2.75rem,8vw,6.5rem);font-weight:300;line-height:1.05;letter-spacing:0;margin:24px 0 0;color:#fff;text-shadow:0 3px 18px rgba(0,0,0,.55)}
 .hero h1 em{font-style:italic;color:var(--acc)}
 .hero p{font-family:var(--sans2);max-width:36rem;margin:28px auto 0;font-size:18px;line-height:1.6;color:rgba(255,255,255,.9);text-shadow:0 2px 8px rgba(0,0,0,.4);font-weight:300}
-.hero-logo{width:min(430px,80vw);height:auto;margin:0 auto;filter:brightness(0) invert(1) drop-shadow(0 4px 22px rgba(0,0,0,.55)) drop-shadow(0 0 3px rgba(0,0,0,.5))}
-.hero-tag{font-family:var(--sans2);font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,.9);margin-top:14px;text-shadow:0 2px 10px rgba(0,0,0,.5)}
+.hero-logo{width:min(380px,68vw);height:auto;margin:0 auto;filter:brightness(0) invert(1) drop-shadow(0 4px 22px rgba(0,0,0,.55)) drop-shadow(0 0 3px rgba(0,0,0,.5))}
+.hero-tag{font-family:var(--sans2);font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,.9);margin-top:20px;text-shadow:0 2px 10px rgba(0,0,0,.5)}
 .hero-inner{animation:heroIn 1.3s var(--ease) both}
 @keyframes heroIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-.hero-cta{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin-top:40px}
+.hero-cta{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin-top:30px}
 .hero .btn{font-family:var(--sans2);font-size:11px;letter-spacing:.18em;padding:15px 32px}
 .hero-dots{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);z-index:3;display:flex;gap:12px}
 .hero-dots span{height:6px;border-radius:99px;background:rgba(255,255,255,.4);width:16px;cursor:pointer;transition:.4s var(--ease)}

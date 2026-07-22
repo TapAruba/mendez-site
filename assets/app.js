@@ -113,9 +113,12 @@
     var heroInner = document.getElementById('heroInner');
     // drop the entrance animation once done so scroll-driven opacity/transform can apply
     if (heroInner) heroInner.addEventListener('animationend', function(){ heroInner.style.animation = 'none'; }, { once: true });
+    var homeHero = document.querySelector('.hero');
     var onScroll = function(){
       var y = window.scrollY;
-      hdr.classList.toggle('scrolled', y > 60);
+      // on home, the solid bar (and its logo) waits until the hero is nearly scrolled past
+      var thr = homeHero ? Math.max(homeHero.offsetHeight - 90, 60) : 60;
+      hdr.classList.toggle('scrolled', y > thr);
       if (heroInner){
         if (y > 0){
           var p = Math.min(y / 340, 1);
