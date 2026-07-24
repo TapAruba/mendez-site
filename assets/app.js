@@ -139,34 +139,38 @@
   if (heroBg){
     var slides = Array.prototype.slice.call(heroBg.querySelectorAll('.slide'));
     var dots = Array.prototype.slice.call(document.querySelectorAll('#heroDots span'));
-    var vid = heroBg.querySelector('video');
+    var vids = slides.filter(function(s){ return s.tagName === 'VIDEO'; });
     var cur = 0, timer;
     var go = function(i){
       cur = (i + slides.length) % slides.length;
       slides.forEach(function(s,n){ s.classList.toggle('on', n === cur); });
       dots.forEach(function(d,n){ d.classList.toggle('on', n === cur); });
       clearTimeout(timer);
-      if (vid && slides[cur] === vid){
-        // video slide plays its full length; 'ended' advances, long timer is a safety net
-        vid.currentTime = 0;
+      var sl = slides[cur];
+      vids.forEach(function(v){ if (v !== sl) v.pause(); });
+      if (sl.tagName === 'VIDEO'){
+        // video slides play their full length; 'ended' advances, long timer is a safety net
+        sl.currentTime = 0;
         timer = setTimeout(function(){ go(cur + 1); }, 60000);
-        vid.play().catch(function(){ clearTimeout(timer); timer = setTimeout(function(){ go(cur + 1); }, 6500); });
+        sl.play().catch(function(){ clearTimeout(timer); timer = setTimeout(function(){ go(cur + 1); }, 6500); });
       } else {
-        if (vid) vid.pause();
         timer = setTimeout(function(){ go(cur + 1); }, 6500);
       }
+      // warm up the next video while a photo is on screen
+      var nx = slides[(cur + 1) % slides.length];
+      if (nx !== sl && nx.tagName === 'VIDEO' && nx.preload !== 'auto'){ nx.preload = 'auto'; nx.load(); }
     };
-    if (vid) vid.addEventListener('ended', function(){ if (slides[cur] === vid) go(cur + 1); });
+    vids.forEach(function(v){ v.addEventListener('ended', function(){ if (slides[cur] === v) go(cur + 1); }); });
     dots.forEach(function(d){ d.addEventListener('click', function(){ go(+d.dataset.s); }); });
     if (slides.length > 1) go(0);
 
-    // pause hero video once scrolled out of view
+    // pause hero videos once scrolled out of view
     var heroSec = document.getElementById('top');
     if (heroSec){
       new IntersectionObserver(function(entries){
         var e = entries[0];
-        if (e.isIntersecting){ if (vid && slides[cur] === vid) vid.play().catch(function(){}); }
-        else if (vid){ vid.pause(); }
+        if (e.isIntersecting){ var sl2 = slides[cur]; if (sl2.tagName === 'VIDEO') sl2.play().catch(function(){}); }
+        else vids.forEach(function(v){ v.pause(); });
       }, { threshold:.02 }).observe(heroSec);
     }
   }
