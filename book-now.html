@@ -200,5 +200,9 @@
 
 <div class="lb" id="lb"><span class="x">&times;</span><img id="lbImg" src="" alt="" /></div>
 <script src="assets/app.js?v=36"></script>
+<script data-tap-analytics>/* Tap Aruba analytics — session-scoped, no cookie */
+(function(){try{var k='ta_s',s=sessionStorage.getItem(k);if(!s){s=Math.random().toString(36).slice(2)+Date.now().toString(36);sessionStorage.setItem(k,s)}
+fetch('https://app.taparuba.com/api/track',{method:'POST',keepalive:true,headers:{'Content-Type':'text/plain'},body:JSON.stringify({site:'mendez-estates-website',path:location.pathname,referrer:document.referrer,session:s})}).catch(function(){})}catch(e){}})();
+</script>
 </body>
 </html>
